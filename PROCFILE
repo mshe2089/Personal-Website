@@ -1,2 +1,1 @@
-pip install -r requirements.txt
 web: waitress-serve --port=$PORT app:app
