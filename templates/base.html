@@ -22,26 +22,29 @@
     <nav class="navbar navbar-expand-lg sticky-top navbar-light bg-light">
         <a class="navbar-brand" href="{{ url_for('landing')}}">Daniel's Blog?</a>
 
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
         <div class="collapse navbar-collapse ml-auto" id="navbarNav">
           {% block navbar %} {% endblock %}
+
+          <ul class="navbar-nav ml-auto flex-nowrap">
+            <li style="padding:0px 5px;" class="nav-item">
+              <a class="btn btn-primary" style="background-color: #6e6e6e;" href="https://docs.google.com/document/d/18W821TemlwzlgqXJFrKWIpq5I6loaoGJ/edit?usp=sharing&ouid=100949681812080638746&rtpof=true&sd=true" role="button"><i class="fas fa-file"></i> Hire me maybe? </a>
+            </li>
+            <li style="padding:0px 5px;" class="nav-item">
+              <a class="btn btn-primary" style="background-color: #3b5998;" href="https://www.facebook.com/danielshen88/" role="button"><i class="fab fa-facebook"></i></a>
+            </li>
+            <li style="padding:0px 5px;" class="nav-item">
+              <a class="btn btn-primary" style="background-color: #333333;" href="https://github.com/mshe2089" role="button"><i class="fab fa-github"></i></a>
+            </li>
+            <li style="padding:0px 5px;" class="nav-item">
+              <a class="btn btn-primary" style="background-color: #0082ca;" href="https://www.linkedin.com/in/muqing-shen-604a3b1a4/" role="button"><i class="fab fa-linkedin"></i></a>
+            </li>
+          </ul>
         </div>
 
-        <div class="collapse navbar-collapse ml-auto" id="navbarNav"><!-- ml-auto = right alignment -->
-            <ul class="navbar-nav ml-auto flex-nowrap">
-              <li style="padding:0px 5px;" class="nav-item">
-                <a class="btn btn-primary" style="background-color: #6e6e6e;" href="https://docs.google.com/document/d/18W821TemlwzlgqXJFrKWIpq5I6loaoGJ/edit?usp=sharing&ouid=100949681812080638746&rtpof=true&sd=true" role="button"><i class="fas fa-file"></i> Hire me maybe? </a>
-              </li>
-              <li style="padding:0px 5px;" class="nav-item">
-                <a class="btn btn-primary" style="background-color: #3b5998;" href="https://www.facebook.com/danielshen88/" role="button"><i class="fab fa-facebook"></i></a>
-              </li>
-              <li style="padding:0px 5px;" class="nav-item">
-                <a class="btn btn-primary" style="background-color: #333333;" href="https://github.com/mshe2089" role="button"><i class="fab fa-github"></i></a>
-              </li>
-              <li style="padding:0px 5px;" class="nav-item">
-                <a class="btn btn-primary" style="background-color: #0082ca;" href="https://www.linkedin.com/in/muqing-shen-604a3b1a4/" role="button"><i class="fab fa-linkedin"></i></a>
-              </li>
-            </ul>
-        </div>
     </nav>
     <div class="container">
         {% block content %} {% endblock %}
