@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %} Sup {% endblock %}
+
+{% block navbar %}
+<ul class="navbar-nav mr-auto flex-nowrap">
+  <li class="nav-item active">
+      <a class="nav-link" aria-current="page" href="{{ url_for('landing')}}">Landing</a><!-- Dead link -->
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('index')}}">Index</a>
+  </li>
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      My stuff
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+      <li><a class="dropdown-item" href="#">Placeholder1</a></li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item" href="#">Placeholder2</a></li>
+    </ul>
+  </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+  <h1> Hey. Welcome to my lonely website. </h1>
+
+  <div class="entry">
+    <br>
+    <b style = "font-size: 150%;">Who are you?</b>
+    <p>
+      <br>Muqing, or Daniel. Undergraduate student at the University of Sydney, studying <strong>mechatronic engineering and computer science</strong>. (Probably) Graduating in 2024.
+    </p>
+    <hr>
+  </div>
+
+  <div class="entry">
+    <br>
+    <b style = "font-size: 150%;">What is this place?</b>
+    <p>
+      <br>A personal website, for showcasing stuff in case I ever do anything interesting.
+      <br>Its a little shoddy right now. I'm still trying to learn the basics of web development.
+      <br>Maybe one day this place will be filled with cool stuff.
+    </p>
+    <hr>
+  </div>
+
+
+{% endblock %}
