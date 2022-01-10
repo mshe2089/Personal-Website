@@ -16,14 +16,13 @@ def landing(name="Fuck you samuel"):
     else:
         url = "https://ipapi.co/" + request.environ['HTTP_X_FORWARDED_FOR'] + "/json/"
 
-    response = urlopen(url)
-    locdata = json.load(response)
+    locdata = json.load(urlopen(url))
 
     print(locdata)
 
     greeting = ""
     if 'error' not in locdata:
-        greeting = "\nThanks for visiting all the way from " + locdata['city'] + " , " + locdata['country_name'] + "!"
+        greeting = " Thanks for visiting all the way from " + locdata['city'] + ", " + locdata['country_name'] + " :)"
 
     return render_template('landing.html', greet=greeting)
 
