@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %} SAT solver {% endblock %}
+
+{% block stylesheets %}
+  <link rel="stylesheet" href="{{ url_for('static', filename= 'css/SATsolver.css') }}">
+{% endblock %}
+
+{% block bodyscripts %}
+  <script type="text/javascript" src="{{ url_for('static', filename='js/SATsolver.js') }}"></script>
+{% endblock %}
+
+{% block navbar %}
+<ul class="navbar-nav mr-auto flex-nowrap">
+  <li class="nav-item">
+      <a class="nav-link" href="{{ url_for('landing')}}">Landing</a><!-- Dead link -->
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{{ url_for('index')}}">Index</a>
+  </li>
+  <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      My stuff
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+      <li><a class="dropdown-item" aria-current="page" href="{{ url_for('SATsolver')}}">SAT solver</a></li>
+      <li><hr class="dropdown-divider"></li>
+      <li><a class="dropdown-item" href="#">Placeholder2</a></li>
+    </ul>
+  </li>
+</ul>
+{% endblock %}
+
+{% block content %}
+  <h1> SAT Solver </h1>
+
+  <div class="entry">
+    <p>
+      <br>This simple tool will brute force the entire truth table of your SAT formula.
+      <br>Made to test out asynchronus page updates using ajax.<br>
+      <br>Recognized operators include conjunctions, negations, disjunctions, implications, double implications.
+      <br>Recognized symbols are <b>['∧','¬','∨','→','↔','(',')']</b>. Whitespaces will be ignored.
+      <br>Variables can be any non-operator, non-whitespace character.<br>
+      <br>Make sure your input is syntactically correct and fully (but not redundantly) parenthesised.
+      <br>(Parser is dumb and requires order of operations to be explicitly specified.)
+      <br>eg. <b>x ∨ y ∨ z</b> and <b>(x) ∨ (y ∨ z)</b> are not okay, but <b>(x ∨ y) ∨ z</b> is.
+      <br>
+      <form name="SATsolver">
+      <input type="text" name="SATformulabox" size="80" placeholder="eg. ((a ∨ b) ∨ ¬c) ∧ ((a ∨ ¬b) ∨ c)"/>
+      <button type="button" id="submitSAT" onClick="">Solve</button>
+    </p>
+    <hr>
+  </div>
+
+  <div class="entry">
+    <p>
+      <br><span id=result></span>
+    </p>
+    <hr>
+  </div>
+
+
+{% endblock %}

@@ -6,6 +6,8 @@ from urllib.request import urlopen
 from random import randint
 from waitress import serve
 
+from py.sat import SATsolve
+
 app = Flask(__name__)
 
 @app.route("/")
@@ -18,7 +20,7 @@ def landing(name="Fuck you samuel"):
 
     locdata = json.load(urlopen(url))
 
-    print(locdata)
+    #print(locdata)
 
     greeting = ""
     if 'error' not in locdata:
@@ -30,7 +32,16 @@ def landing(name="Fuck you samuel"):
 def index():
     return render_template('index.html', num = randint(0,100))
 
+@app.route("/SATsolver")
+def SATsolver():
+    return render_template('SATsolver.html')
+
+@app.route('/SATsolver_script')
+def SATsolver_script():
+    formula = request.args.get('formula', None, type=str)
+    return {"result": SATsolve(formula)}
+
 if __name__ == "__main__":
-    print("Running.")
+    print("Running...")
     #app.run('0.0.0.0',port=8000)
-    serve(app, host='0.0.0.0', port=8080)
+    serve(app, host='0.0.0.0', port=8000)
