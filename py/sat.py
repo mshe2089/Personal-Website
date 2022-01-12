@@ -27,47 +27,54 @@ def SATsolve(input):
         """
             Solving for all operations
         """
-        formula_stack = []
+        formula_stack = [[]]
 
-        for x,i in enumerate(formula):
-            if i == ')':
-                try:
-                    op2 = formula_stack.pop()
-                    oper = formula_stack.pop()
-                    op1 = formula_stack.pop()
-                    l = formula_stack.pop()
-                    if (oper not in opers) or (op2 not in ops) or (op1 not in ops) or (l != '('):
-                        raise
-                except:
-                    raise BadFormulaException
-
-                if formula_stack and formula_stack[-1] == '¬':
-                    formula_stack.pop()
-                    formula_stack.append(1 - opers[oper](op1, op2))
-                else:
-                    formula_stack.append(opers[oper](op1, op2))
-
+        #Adds a character to a clause, then evaluates it if complete.
+        def appendChar(i):
+            if i in ops and formula_stack[-1] and formula_stack[-1][-1] == '¬':
+                formula_stack[-1].pop()
+                formula_stack[-1].append(1 - i)
             else:
-                if i in ops and formula_stack and formula_stack[-1] == '¬':
-                    formula_stack.pop()
-                    formula_stack.append(1 - i)
-                else:
-                    formula_stack.append(i)
+                formula_stack[-1].append(i)
 
-        #Parse leftovers
-        if len(formula_stack) > 1:
+            if len(formula_stack[-1]) >= 3 and formula_stack[-1][-1] != '¬':
+                evalClause()
+
+        #Evaluates the innermost clause; {variable}{operator}{variable} ==> {variable}
+        def evalClause():
             try:
-                op2 = formula_stack.pop()
-                oper = formula_stack.pop()
-                op1 = formula_stack.pop()
-                if (oper not in opers) or (op2 not in ops) or (op1 not in ops) or formula_stack:
-                    raise
+                op2 = formula_stack[-1].pop()
+                oper = formula_stack[-1].pop()
+                op1 = formula_stack[-1].pop()
+                if (oper not in opers) or (op2 not in ops) or (op1 not in ops) or formula_stack[-1]: raise
             except:
                 raise BadFormulaException
+            formula_stack[-1].append(opers[oper](op1, op2))
 
-            formula_stack.append(opers[oper](op1, op2))
+        for x,i in enumerate(formula):
 
-        return str(formula_stack.pop())
+            if i == ')':
+                try:
+                    i = formula_stack[-1].pop()
+                    if i not in ops or formula_stack[-1]: raise
+                    formula_stack.pop()
+                except:
+                    raise BadFormulaException
+                appendChar(i)
+
+            elif i == '(':
+                formula_stack.append([])
+
+            else:
+                appendChar(i)
+
+        #Parse leftovers
+        if len(formula_stack) > 1: raise BadFormulaException
+
+        if len(formula_stack[-1]) > 1:
+            evalClause()
+
+        return str(formula_stack[-1].pop())
 
 
     #Main printing
@@ -107,17 +114,10 @@ def SATsolve(input):
 
 
 '''
-    Read carefully!
-    This function will output the entire truth table of a SAT formula.
-    It uses brute force.
-    Recognized operators include conjunctions, negations, dysjunctions, implications, double implications.
-    The recognized symbols are ['∧','¬','∨','→','↔','(',')']. Whitespaces will be ignored.
-    Variables can be any non-operator, non-space, non-weird character.
-    Make sure your input is syntactically correct and fully (but not redundantly) parenthesised.
-    eg. x ∨ y ∨ z and (x) ∨ (y ∨ z) are not okay, but (x ∨ y) ∨ z is.
+DEBUG
 '''
 
 if __name__ == "__main__":
-    print(SATsolve("((((¬a ∧ ¬b) ∧ c) ∨ ((¬a ∧ b) ∧ ¬c)) ∨ ((a ∧ ¬b) ∧ ¬c)) ∨  ((a ∧ b) ∧ c)"))
+    print(SATsolve("¬(((((¬a ∧ ¬b) ∧ c) ∨ ((¬a ∧ b) ∧ ¬c)) ∨ ((a ∧ ¬b) ∧ ¬c)) ∨  ((a ∧ b) ∧ c))"))
 
-    print(SATsolve("((((a ∨ b) ∨ ¬c) ∧ ((a ∨ ¬b) ∨ c)) ∧ ((¬a ∨ b) ∨ c)) ∧ ((¬a ∨ ¬b) ∨ ¬c)"))
+    print(SATsolve("((x ∨ ¬(¬y ∨ (z ∧ ¬z)) ∨ w))"))
