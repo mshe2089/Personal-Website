@@ -7,6 +7,8 @@
 {% endblock %}
 
 {% block bodyscripts %}
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='js/USYDmarks.js') }}"></script>
 {% endblock %}
 
@@ -16,10 +18,10 @@
   <div class="entry">
     <p>
       <br>This script will calculate your overall course wam at USYD.
-      <br>The formula used is: PLACEHOLDER
-      <br>I swear, swear, swear, to the moon and the starts in the sky, cross my heart and hope to die, so help me god, that <b>This wont record any of your private information.</b>
+      <br>The formula used is: <b>\[ \frac{\sum_{}^{} (UOS\_mark \times UOS\_CP)}{\sum_{}^{} (UOS\_CP)}\]</b>
+      I swear, swear, swear, to the moon and the stars in the sky, cross my heart and hope to die, so help me god, that <b>this wont record any of your private information.</b>
       It needs your login credentials to log into Sydney Student to access your records. But if you're still apprehensive, feel free to refrain from using this tool.
-      <br>This tool is for reference only. Please use your own better judgement when using any results.
+      <br>Results are for reference only. Please use your own better judgement when using any information obtained from this tool.
       <br>
       <form name="SATsolver">
       <input type="text" name="usernamebox" size="40" placeholder="unikey"/><br>
