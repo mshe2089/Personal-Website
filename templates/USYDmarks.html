@@ -29,8 +29,8 @@
       <br>Results are for reference only. I accept no responsibility. Please use your better judgement when using any information obtained from this tool.
       <br>
       <form name="loginform">
-      <input type="text" name="usernamebox" size="40" placeholder="unikey"/><br>
-      <input type="text" name="passwordbox" size="40" placeholder="password"/>
+      <input type="text" id="usernamebox" name="usernamebox" size="40" placeholder="unikey" ><br>
+      <input type="text" id="passwordbox" name="passwordbox" size="40" placeholder="password" >
       <button type="button" id="submitCredentials" onClick="">Get WAM</button>
       <div id = "loading"><br>Logging in to sydney student... <img src="{{url_for('static',filename = 'assets/loading.gif')}}" height="24px" width=“24px”></div>
     </p>

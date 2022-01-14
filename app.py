@@ -12,7 +12,7 @@ from static.py.getmymarks import getmymarks
 app = Flask(__name__)
 
 @app.route("/")
-def landing(name="Fuck you samuel"):
+def landing():
 
     if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
         url = "https://ipapi.co/" + request.environ['REMOTE_ADDR'] + "/json/"
@@ -65,4 +65,4 @@ def USYDmarks_script():
 if __name__ == "__main__":
     print("Running...")
     #app.run('0.0.0.0',port=8080)
-    serve(app, host='0.0.0.0', port=8080)
+    serve(app, host='0.0.0.0', port=8000)
