@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup #beautifulsoup4 2.2.1
 import os
-import chromedriver_autoinstaller #chromedriver_autoinstaller 0.2.24
-chromedriver_autoinstaller.install()
+#import chromedriver_autoinstaller #chromedriver_autoinstaller 0.2.24
+#chromedriver_autoinstaller.install()
 from selenium import webdriver #selenium 1.26.6
 from selenium.webdriver.chrome.options import Options
 
