@@ -45,7 +45,10 @@ def SATsolver_script():
 
 @app.route("/USYDmarks")
 def USYDmarks():
-    return render_template('USYDmarks.html')
+    codefile = open("static/py/getmymarks.py", "r")
+    codetext = codefile.read()
+    codefile.close()
+    return render_template('USYDmarks.html', code = codetext)
 
 @app.route('/USYDmarks_script')
 def USYDmarks_script():

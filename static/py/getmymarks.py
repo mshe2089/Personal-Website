@@ -1,9 +1,13 @@
-from bs4 import BeautifulSoup #beautifulsoup4 2.2.1
+from bs4 import BeautifulSoup
 import os
 #import chromedriver_autoinstaller #chromedriver_autoinstaller 0.2.24
 #chromedriver_autoinstaller.install()
-from selenium import webdriver #selenium 1.26.6
+from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+
+"""
+Source code for the USYD wam calculator.
+"""
 
 class MarkParsingException(Exception):
     pass
@@ -13,7 +17,9 @@ class LoginFailureException(Exception):
 
 def getmymarks(username, password):
 
-    print("logging in to Sydney Student...")
+    """
+    Instantiating webdriver
+    """
 
     options = Options()
     #comment out below for local
@@ -31,6 +37,9 @@ def getmymarks(username, password):
     #comment out path for local
     driver = webdriver.Chrome(executable_path=str(os.environ.get('CHROMEDRIVER_PATH')), options=options)
 
+    """
+    Attempting login
+    """
     try:
         driver.get("https://sydneystudent.sydney.edu.au/sitsvision/wrd/siw_lgn");
         driver.find_element_by_name('MUA_CODE.DUMMY.MENSYS.1').send_keys(username)
@@ -48,6 +57,9 @@ def getmymarks(username, password):
         driver.quit()
         raise LoginFailureException
 
+    """
+    Navigating to results page and parsing html
+    """
     try:
         coursetabletext = (driver.find_elements_by_class_name("sv-panel-primary")[3].find_element_by_tag_name("tbody")).text
         coursetabletext = coursetabletext[:coursetabletext.rfind('\n')]
@@ -64,13 +76,12 @@ def getmymarks(username, password):
         raise MarkParsingException
 
     driver.quit()
-    #BeautifulSoup(driver.find_element_by_id('course-details').text, 'html.parser')
     return(coursetabletext, WAM)
 
 
 if __name__ == "__main__":
     try:
-        courses, wam = getmymarks("mshe2089","wtfdetwtfdwj")
+        courses, wam = getmymarks("My own login details","used to be here")
         print(courses)
         print(wam)
     except LoginFailureException:
