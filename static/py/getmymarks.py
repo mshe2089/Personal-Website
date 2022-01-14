@@ -16,6 +16,7 @@ def getmymarks(username, password):
     print("logging in to Sydney Student...")
 
     options = Options()
+    #comment out below for local
     options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
 
     options.add_argument("--window-size=1920,1080")
@@ -26,6 +27,8 @@ def getmymarks(username, password):
     options.add_argument("--no-sandbox")
     options.add_argument('--disable-gpu')
     options.add_argument('--headless')
+
+    #comment out path for local
     driver = webdriver.Chrome(executable_path=str(os.environ.get('CHROMEDRIVER_PATH')), options=options)
 
     try:
