@@ -2,27 +2,6 @@
 
 {% block title %} Sup {% endblock %}
 
-{% block navbar %}
-<ul class="navbar-nav mr-auto flex-nowrap">
-  <li class="nav-item">
-      <a class="nav-link" href="{{ url_for('landing')}}">Landing</a><!-- Dead link -->
-  </li>
-  <li class="nav-item active">
-    <a class="nav-link" aria-current="page" href="{{ url_for('index')}}">Index</a>
-  </li>
-  <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      My stuff
-    </a>
-    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-      <li><a class="dropdown-item" href="{{ url_for('SATsolver')}}">SAT solver</a></li>
-      <li><hr class="dropdown-divider"></li>
-      <li><a class="dropdown-item" href="#">Placeholder2</a></li>
-    </ul>
-  </li>
-</ul>
-{% endblock %}
-
 {% block content %}
   <h1> Hey. Welcome to the index. </h1>
 

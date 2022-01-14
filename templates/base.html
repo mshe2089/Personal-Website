@@ -31,15 +31,36 @@
         </button>
 
         <div class="collapse navbar-collapse ml-auto" id="navbarNav">
-          {% block navbar %} {% endblock %}
+          {% block navbar %}
+          <ul class="navbar-nav mr-auto flex-nowrap">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('landing')}}">Landing</a><!-- Dead link -->
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('index')}}">Index</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                My stuff
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" aria-current="page" href="{{ url_for('SATsolver')}}">Truth table generator</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ url_for('USYDmarks')}}">USYD wam calculator</a></li>
+              </ul>
+            </li>
+          </ul>
+          {% endblock %}
 
           <ul class="navbar-nav ml-auto flex-nowrap">
             <li style="padding:0px 5px;" class="nav-item">
               <a class="btn btn-primary" style="background-color: #6e6e6e;" href="https://docs.google.com/document/d/18W821TemlwzlgqXJFrKWIpq5I6loaoGJ/edit?usp=sharing&ouid=100949681812080638746&rtpof=true&sd=true" role="button"><i class="fas fa-file"></i> Hire me maybe? </a>
             </li>
+            <!--
             <li style="padding:0px 5px;" class="nav-item">
               <a class="btn btn-primary" style="background-color: #3b5998;" href="https://www.facebook.com/danielshen88/" role="button"><i class="fab fa-facebook"></i></a>
             </li>
+            -->
             <li style="padding:0px 5px;" class="nav-item">
               <a class="btn btn-primary" style="background-color: #333333;" href="https://github.com/mshe2089" role="button"><i class="fab fa-github"></i></a>
             </li>

@@ -6,7 +6,8 @@ from urllib.request import urlopen
 from random import randint
 from waitress import serve
 
-from py.sat import SATsolve
+from static.py.sat import SATsolve
+from static.py.getmymarks import getmymarks
 
 app = Flask(__name__)
 
@@ -41,7 +42,24 @@ def SATsolver_script():
     formula = request.args.get('formula', None, type=str)
     return {"result": SATsolve(formula)}
 
+
+@app.route("/USYDmarks")
+def USYDmarks():
+    return render_template('USYDmarks.html')
+
+@app.route('/USYDmarks_script')
+def USYDmarks_script():
+    try:
+        username = request.args.get('username', None, type=str)
+        password = request.args.get('password', None, type=str)
+        units, WAM = getmymarks(username, password)
+        print(units)
+        print(WAM)
+    except:
+        return {"units": "Error. Check your credentials.", "WAM": ""}
+    return {"units": units, "WAM": "Your WAM is: " + WAM}
+
 if __name__ == "__main__":
     print("Running...")
-    #app.run('0.0.0.0',port=8000)
-    serve(app, host='0.0.0.0', port=8000)
+    #app.run('0.0.0.0',port=8080)
+    serve(app, host='0.0.0.0', port=8080)

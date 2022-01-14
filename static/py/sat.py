@@ -106,8 +106,8 @@ def SATsolve(input):
         try:
             ans += (" " + "  ".join(dec_to_bin(i)) + "  =   " + test(formula, dec_to_bin(i)) + "\n")
         except:
-            ans += ("Formula is badly formatted; cannot evaluate.\n")
-            break
+            return "Formula is incorrectly formatted.\n"
+
     ans += ("---" * (len(variables) + 3) + "\n")
 
     return ans

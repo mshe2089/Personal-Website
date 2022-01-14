@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %} SAT solver {% endblock %}
+
+{% block stylesheets %}
+  <link rel="stylesheet" href="{{ url_for('static', filename= 'css/USYDmarks.css') }}">
+{% endblock %}
+
+{% block bodyscripts %}
+  <script type="text/javascript" src="{{ url_for('static', filename='js/USYDmarks.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+  <h1> USYD wam calculator </h1>
+
+  <div class="entry">
+    <p>
+      <br>This script will calculate your overall course wam at USYD.
+      <br>The formula used is: PLACEHOLDER
+      <br>I swear, swear, swear, to the moon and the starts in the sky, cross my heart and hope to die, so help me god, that <b>This wont record any of your private information.</b>
+      It needs your login credentials to log into Sydney Student to access your records. But if you're still apprehensive, feel free to refrain from using this tool.
+      <br>This tool is for reference only. Please use your own better judgement when using any results.
+      <br>
+      <form name="SATsolver">
+      <input type="text" name="usernamebox" size="40" placeholder="unikey"/><br>
+      <input type="text" name="passwordbox" size="40" placeholder="password"/>
+      <button type="button" id="submitCredentials" onClick="">Get WAM</button>
+      <div id = "loading"><br>Logging in to sydney student... <img src="{{url_for('static',filename = 'assets/loading.gif')}}" height="24px" width=“24px”></div>
+    </p>
+    <hr>
+  </div>
+
+  <div class="entry">
+    <p>
+      <span id=units></span>
+    </p>
+    <hr>
+    <p>
+      <b><span id=wam></span></b>
+    </p>
+    <hr>
+  </div>
+
+  <div class="entry">
+    <p id = "disclaimer">
+      <br>If you find a bug, I'm sorry (ಥ﹏ಥ)
+    </p>
+  </div>
+
+
+{% endblock %}

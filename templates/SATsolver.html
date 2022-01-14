@@ -10,34 +10,13 @@
   <script type="text/javascript" src="{{ url_for('static', filename='js/SATsolver.js') }}"></script>
 {% endblock %}
 
-{% block navbar %}
-<ul class="navbar-nav mr-auto flex-nowrap">
-  <li class="nav-item">
-      <a class="nav-link" href="{{ url_for('landing')}}">Landing</a><!-- Dead link -->
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="{{ url_for('index')}}">Index</a>
-  </li>
-  <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      My stuff
-    </a>
-    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-      <li><a class="dropdown-item" aria-current="page" href="{{ url_for('SATsolver')}}">SAT solver</a></li>
-      <li><hr class="dropdown-divider"></li>
-      <li><a class="dropdown-item" href="#">Placeholder2</a></li>
-    </ul>
-  </li>
-</ul>
-{% endblock %}
-
 {% block content %}
-  <h1> SAT formula solver </h1>
+  <h1> Truth table generator </h1>
 
   <div class="entry">
     <p>
       <br>This simple tool will brute force the entire truth table of your SAT formula.
-      <br>Made to test out asynchronus page updates using ajax.<br>
+      <br>Made to test out asynchronus page updates using ajax. Uses some old python script I made. <br>
       <br>Recognized operators include conjunctions, negations, disjunctions, implications, double implications.
       <br>Recognized symbols are <b>['∧','¬','∨','→','↔','(',')']</b>. Whitespaces will be ignored.
       <br>Variables can be any non-operator, non-whitespace character.<br>
