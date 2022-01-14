@@ -7,6 +7,11 @@ from selenium.webdriver.chrome.options import Options
 
 """
 Source code for the USYD wam calculator.
+Manually traverses site with selenium.
+I tried the requests library, but the Sydney Student URL querystring was encrypted.
+If you know of a better way to do this (there probably is), please enlighten me.
+
+-Daniel
 """
 
 class MarkParsingException(Exception):
