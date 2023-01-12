@@ -1,3 +1,3 @@
 # my_website
 
-https://muqing.herokuapp.com/
+visit it at https://muqing.herokuapp.com/ when it isnt broken
