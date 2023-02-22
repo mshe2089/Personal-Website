@@ -1,5 +1,14 @@
 # Personal website
 
-currently down due to heroku terms of service changes
+Self hosted dynamic website for portfolio/experimental/learning purposes.
 
-visit it at https://muqing.herokuapp.com/ when it isnt broken
+Down since Heroku's free tier plan was nuked. **RIP 2020-2022**
+
+Still a work-in-progress. Visit it at http://60.242.105.88 (if you dare)
+
+Currently:
+ - Reworking the project structure for better extensibility
+ - Improving security (reverse proxy, secrets (dont hack my raspberry please))
+ - Adding a proper frontend framework
+ - Working on containerization (docker)
+ - Getting it properly hosted (looking for a DNS provider, a cheap domain name, an SSL certificate, etc)

@@ -1,27 +1,30 @@
-import os
-import json
+import os, sys, json, time, pprint
+
 from flask import Flask, render_template, jsonify, request
 
+from urllib.error import HTTPError
 from urllib.request import urlopen
 from random import randint
 from waitress import serve
 
-from static.py.sat import SATsolve
-from static.py.getmymarks import getmymarks
+from dynamic.py.sat import SATsolve
+from dynamic.py.getmymarks import getmymarks
 
 app = Flask(__name__)
 
 @app.route("/")
 def landing():
-
+    
     if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
         url = "https://ipapi.co/" + request.environ['REMOTE_ADDR'] + "/json/"
     else:
         url = "https://ipapi.co/" + request.environ['HTTP_X_FORWARDED_FOR'] + "/json/"
-
-    locdata = json.load(urlopen(url))
-
-    #print(locdata)
+        
+    try:
+        locdata = json.load(urlopen(url))
+    except HTTPError:
+        time.sleep(0.1)
+        locdata = json.load(urlopen(url))
 
     greeting = ""
     if 'error' not in locdata:
@@ -63,6 +66,17 @@ def USYDmarks_script():
     return {"units": units, "WAM": "Your WAM is: " + WAM}
 
 if __name__ == "__main__":
-    print("Running...")
-    #app.run('0.0.0.0',port=8080)
-    serve(app, host='0.0.0.0', port=8000)
+
+    app.config.from_object("config.ProductionConfig")
+
+    for i in sys.argv[1:]:
+        if i == "--development":
+            app.config.from_object("config.DevelopmentConfig")
+        elif i == "--testing":
+            app.config.from_object("config.TestingConfig")
+    
+    print("We are live!")
+    print("Config: ", end = "")    
+    pprint.pprint(app.config)
+    
+    serve(app, host='0.0.0.0', port=80)
