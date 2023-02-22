@@ -14,21 +14,25 @@ app = Flask(__name__)
 
 @app.route("/")
 def landing():
-    
+    """
+    # Prone to errors - move to lazy loading or something later (And put it in a seperate file)
     if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
         url = "https://ipapi.co/" + request.environ['REMOTE_ADDR'] + "/json/"
     else:
         url = "https://ipapi.co/" + request.environ['HTTP_X_FORWARDED_FOR'] + "/json/"
-        
+    
     try:
         locdata = json.load(urlopen(url))
     except HTTPError:
         time.sleep(0.1)
         locdata = json.load(urlopen(url))
+    """
 
     greeting = ""
+    """
     if 'error' not in locdata:
         greeting = " Thanks for visiting all the way from " + locdata['city'] + ", " + locdata['country_name'] + " :)"
+    """
 
     return render_template('landing.html', greet=greeting)
 
@@ -48,7 +52,7 @@ def SATsolver_script():
 
 @app.route("/USYDmarks")
 def USYDmarks():
-    codefile = open("static/py/getmymarks.py", "r")
+    codefile = open("flaskr/dynamic/py/getmymarks.py", "r")
     codetext = codefile.read()
     codefile.close()
     return render_template('USYDmarks.html', code = codetext)
@@ -78,5 +82,5 @@ if __name__ == "__main__":
     print("We are live!")
     print("Config: ", end = "")    
     pprint.pprint(app.config)
-    
+
     serve(app, host='0.0.0.0', port=80)
