@@ -28,7 +28,8 @@ def getmymarks(username, password):
 
     options = Options()
     #comment out below for local
-    options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
+    #options.binary_location = os.environ.get('GOOGLE_CHROME_BIN')
+    options.binary_location = "/usr/bin/chromium-browser"
 
     options.add_argument("--window-size=1920,1080")
     options.add_argument("--start-maximized")
@@ -40,7 +41,8 @@ def getmymarks(username, password):
     options.add_argument('--headless')
 
     #comment out path for local
-    driver = webdriver.Chrome(executable_path=str(os.environ.get('CHROMEDRIVER_PATH')), options=options)
+    #driver = webdriver.Chrome(executable_path=str(os.environ.get('CHROMEDRIVER_PATH')), options=options)
+    driver = webdriver.Chrome(executable_path=str("/usr/bin/chromedriver"), options=options)
 
     """
     Attempting login
@@ -60,6 +62,7 @@ def getmymarks(username, password):
         course.click()
     except:
         driver.quit()
+        print("Login failed")
         raise LoginFailureException
 
     """
@@ -78,6 +81,7 @@ def getmymarks(username, password):
         WAM = str(round(MARK_tot/CP_tot, 2))
     except:
         driver.quit()
+        print("Mark parsing failed")
         raise MarkParsingException
 
     driver.quit()

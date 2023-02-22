@@ -30,7 +30,7 @@
       <br>
       <form name="loginform">
       <input type="text" id="usernamebox" name="usernamebox" size="40" placeholder="unikey" ><br>
-      <input type="text" id="passwordbox" name="passwordbox" size="40" placeholder="password" >
+      <input type="password" id="passwordbox" name="passwordbox" size="40" placeholder="password" >
       <button type="button" id="submitCredentials" onClick="">Get WAM</button>
       <div id = "loading"><br>Logging in to sydney student... <img src="{{url_for('static',filename = 'assets/loading.gif')}}" height="24px" width=“24px”></div>
     </p>
@@ -52,12 +52,11 @@
   <div class="entry">
     <pre><code id=USYDmarkssrc class="language-python">{{code}}</code></pre>
     <hr>
-    <br>
   </div>
 
   <div class="entry">
     <p id = "disclaimer">
-      <br>If you find a bug, I'm sorry (ಥ﹏ಥ)... Shoot me an email about it.
+      <br>Report bugs and submit suggestions via email.
     </p>
   </div>
 
