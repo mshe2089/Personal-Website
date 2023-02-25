@@ -1,14 +1,24 @@
 # Personal website
 
-Self hosted dynamic website for portfolio/experimental/learning purposes.
+Personal dynamic website for portfolio/experimental/learning purposes.
 
-Down since Heroku's free tier plan was nuked. **RIP 2021-2022**
+Previously hosted on Heroku until the free tier plan was nuked. **RIP 2021-2022**
 
-Still a work-in-progress. Visit it at http://60.242.105.88 (if you dare)
+Currently hosted on a Raspberry Pi 4b on my table.
+
+Still a work-in-progress. Visit it at http://muqing.dev/landing (After I'm finished registering the domain)
+
+# Hosting
+
+Build api (flaskr) and client (reactf) images first.
+
+```
+docker compose up
+```
+
+# TODO
 
 Currently:
- - Reworking the project structure for better extensibility
- - Improving security (reverse proxy, secrets) (please dont hack my pi)
- - Adding a proper frontend framework
- - Working on containerization (docker)
+ - Looking into additional security measures
  - Getting it properly hosted (looking for a DNS provider, a cheap domain name, an SSL certificate, etc)
+ - Thinking of features to add
