@@ -12,7 +12,7 @@ Still a work-in-progress. Visit it at http://muqing.dev/landing
 
 Build api (flaskr) and client (reactf) images first. 
 
-For https, ensure `cert.pem` and  ` ` exist in /etc/ssl
+For https, ensure `cert.pem` and  `key.pem` exist in /etc/ssl
 
 ```
 docker compose up
