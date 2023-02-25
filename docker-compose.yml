@@ -1,0 +1,19 @@
+services:
+  chrome:
+    image: seleniarm/standalone-chromium:latest
+    hostname: chrome
+    shm_size: 2g
+    ports:
+      - "4444:4444"
+  api:
+    build:
+      context: .
+      dockerfile: flaskr/Dockerfile.api
+    image: personal-website-api
+  client:
+    build:
+      context: .
+      dockerfile: flaskr/Dockerfile.client
+    image: personal-website-client
+    ports:
+      - "80:80"
