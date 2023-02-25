@@ -2,7 +2,7 @@
 
 Personal dynamic website for portfolio/experimental/learning purposes.
 
-Previously hosted on Heroku until the free tier plan was nuked. **RIP 2021-2022**
+Previously hosted on Heroku until the free tier plan was nuked.
 
 Currently hosted on a Raspberry Pi 4b.
 
