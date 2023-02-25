@@ -25,7 +25,7 @@ function Landing() {
         <p className ="paragraph">
             <br/>I intended this website for showcasing interesting stuff or just silly experiments.
             <br/>
-            <br/>Unfortunately in its current state its very shady... I'm working on getting it properly domain registered.
+            <br/>Very much still a work in progress, dead links everywhere.
             <br/>
             <br/>Look around and see if you find anything useful. If you have any suggestions feel free to email me.
             <br/>

@@ -19,12 +19,12 @@ function NavBar() {
 
           <Nav className="me-auto flex-nowrap">
             <Nav.Link href="/landing">Landing</Nav.Link>
-            <Nav.Link href="#link">Index</Nav.Link>
+            <Nav.Link href="#link">Placeholder</Nav.Link>
             <NavDropdown title="Stuff" id="basic-nav-dropdown">
               <NavDropdown.Item href="/tools/satsolver">Truth table generator</NavDropdown.Item>
               <NavDropdown.Item href="/tools/usydmarks">USYD wam calculator</NavDropdown.Item>
               <NavDropdown.Divider />
-              <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
+              <NavDropdown.Item href="#action/3.3">Placeholder</NavDropdown.Item>
             </NavDropdown>
           </Nav>
 

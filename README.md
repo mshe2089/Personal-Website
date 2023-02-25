@@ -6,11 +6,13 @@ Previously hosted on Heroku until the free tier plan was nuked. **RIP 2021-2022*
 
 Currently hosted on a Raspberry Pi 4b.
 
-Still a work-in-progress. Visit it at http://muqing.dev/landing (After I'm finished registering the domain)
+Still a work-in-progress. Visit it at http://muqing.dev/landing
 
 # Hosting
 
-Build api (flaskr) and client (reactf) images first.
+Build api (flaskr) and client (reactf) images first. 
+
+For https, ensure `cert.pem` and  ` ` exist in /etc/ssl
 
 ```
 docker compose up
@@ -20,5 +22,4 @@ docker compose up
 
 Currently:
  - Looking into additional security measures
- - Getting it properly hosted (looking for a DNS provider, a cheap domain name, an SSL certificate, etc)
  - Thinking of features to add
