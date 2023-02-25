@@ -4,7 +4,7 @@ Personal dynamic website for portfolio/experimental/learning purposes.
 
 Previously hosted on Heroku until the free tier plan was nuked. **RIP 2021-2022**
 
-Currently hosted on a Raspberry Pi 4b on my table.
+Currently hosted on a Raspberry Pi 4b.
 
 Still a work-in-progress. Visit it at http://muqing.dev/landing (After I'm finished registering the domain)
 
