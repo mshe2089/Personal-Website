@@ -8,12 +8,12 @@ services:
   api:
     build:
       context: .
-      dockerfile: flaskr/Dockerfile.api
+      dockerfile: ./flaskr/dockerfile.flaskr
     image: personal-website-api
   client:
     build:
       context: .
-      dockerfile: flaskr/Dockerfile.client
+      dockerfile: ./reactf/dockerfile.reactf
     image: personal-website-client
     ports:
       - "80:80"
