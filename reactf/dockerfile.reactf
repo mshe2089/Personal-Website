@@ -2,7 +2,7 @@
 FROM node:19-alpine as build-step
 WORKDIR /reactf
 ENV PATH /reactf/node_modules/.bin:$PATH
-COPY . .
+COPY ./reactf .
 RUN yarn install
 RUN yarn build
 

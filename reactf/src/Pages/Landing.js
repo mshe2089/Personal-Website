@@ -15,6 +15,7 @@ function Landing() {
             <br/> Thanks for visiting.
             <br/>
         </p>
+        <br/>
         </div>
 
         <hr className ="divider"/>
@@ -32,6 +33,21 @@ function Landing() {
             <br/>This site is dynamic for no good reason, and self hosted on a Raspberry Pi 4B.
             <br/>
         </p>
+        <br/>
+        </div>
+
+        <hr className ="divider"/>
+
+        <div className ="entry">
+        <br/>
+        <b className ="subtitle">How much does this site cost to run?</b>
+        <p className ="paragraph">
+            <br/><code>muqing.dev</code> domain: 18 AUD/year
+            <br/>
+            <br/>Electricity for the Raspberry Pi: ???
+            <br/>
+        </p>
+        <br/>
         </div>
 
         <hr className ="divider"/>

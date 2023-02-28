@@ -10,12 +10,12 @@ Still a work-in-progress. Visit it at http://muqing.dev/landing
 
 # Hosting
 
-Build api (flaskr) and client (reactf) images first. 
+Build and run the production docker containers.
 
 For https, ensure `cert.pem` and  ` ` exist in /etc/ssl
 
 ```
-docker compose up
+docker compose up --build
 ```
 
 # TODO
