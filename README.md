@@ -1,25 +1,39 @@
-# Personal website
+# The Daniel Lab (Server Edition)
 
-Personal dynamic website for portfolio/experimental/learning purposes.
+This is a high-performance, minimalist Technical Journal designed to showcase experiments in Machine Learning, Graphics (WGPU), Game Development, and Security.
 
-Previously hosted on Heroku until the free tier plan was nuked.
+## Architecture
 
-Currently hosted on a Raspberry Pi 4b.
+The Lab follows an **Efficient Minimalist** architecture optimized for the **Server** (Dell Inspiron 7590). It is structured as an outbound-ready "Zero-Fiddle" deployment using Docker and Cloudflare Tunnels.
 
-Still a work-in-progress. Visit it at http://muqing.dev/landing
+### Gateway & Delivery
 
-# Hosting
+*   **API Gateway (NGINX)**: The authoritative sentry. It handles SSL termination, static file delivery, and reverse-proxying through a **Unified Gateway** model (`infra/common_routes.conf`).
+*   **Frontend (React/Vite)**: A high-performance, containerized UI that consumes a centralized **Routing Registry** (`src/registry/registry.js`).
+*   **Logic (Python/Flask)**: The computational core handling technical tasks like SAT solving.
 
-Build and run the production docker containers.
+### Portability Layers
 
-For https, ensure `cert.pem` and  `key.pem` exist in /etc/ssl
+1.  **Cloudflare Tunnel**: Outbound-only connectivity to `muqing.dev` without port forwarding.
+2.  **Infrastructure Isolation**: All delivery pipeline assets are separated into `infra/` directories within their respective service nodes.
 
-```
-docker compose up --build
-```
+## Quick Start
 
-# TODO
+1.  **Configure Environment**:
+    ```bash
+    cp .env.example .env
+    # Add your CLOUDFLARE_TUNNEL_TOKEN to .env
+    ```
+2.  **Launch**:
+    ```bash
+    docker compose up --build -d
+    ```
 
-Currently:
- - Looking into additional security measures
- - Thinking of features to add
+## Documentation
+
+- [Phase Roadmap](./task.md)
+- [Implementation Plan](./implementation_plan.md)
+- [Deployment Walkthrough](./walkthrough.md)
+
+---
+*Architectural integrity maintained by Anti*

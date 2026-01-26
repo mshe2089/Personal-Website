@@ -1,0 +1,36 @@
+.navbar-minimal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #161b22;
+  border-bottom: 1px solid #30363d;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-brand a {
+  font-weight: bold;
+  font-size: 1.25rem;
+  color: #f0f6fc;
+}
+
+.navbar-links,
+.navbar-social {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.navbar-links a,
+.navbar-social a {
+  color: #8b949e !important;
+  font-size: 0.9rem;
+  transition: color 0.2s ease;
+  text-decoration: none;
+}
+
+.navbar-links a:hover,
+.navbar-social a:hover {
+  color: #58a6ff !important;
+}

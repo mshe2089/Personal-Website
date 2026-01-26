@@ -1,22 +1,24 @@
 services:
-  chrome:
-    image: seleniarm/standalone-chromium:latest
-    hostname: chrome
-    shm_size: 2g
-    ports:
-      - "4444:4444"
-  api:
+  core:
     build:
       context: .
       dockerfile: ./flaskr/dockerfile.flaskr
     image: personal-website-api
-  client:
+    restart: always
+  api:
     build:
       context: .
-      dockerfile: ./reactf/dockerfile.reactf
+      dockerfile: ./reactf/infra/dockerfile.reactf
     image: personal-website-client
+    restart: always
     ports:
-      - "80:80"
-      - "443:443"
-    volumes: 
-     - /etc/ssl:/etc/ssl
+      - "${PORT_HTTP:-80}:80"
+      - "${PORT_HTTPS:-443}:443"
+    volumes:
+      - ${SSL_CERT_PATH:-./certs}:/etc/nginx/ssl
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    restart: always
