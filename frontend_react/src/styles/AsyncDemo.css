@@ -1,0 +1,130 @@
+/* Using global .content, .title and h1 classes */
+.demo-card {
+
+    .description {
+        font-style: italic;
+        color: #333;
+        margin-bottom: 2.5rem;
+        text-align: left;
+        border-left: 3px solid #eee;
+        padding-left: 1.5rem;
+    }
+
+    .method-selector {
+        display: flex;
+        border-bottom: 1px solid #000;
+        margin-bottom: 2rem;
+        gap: 1rem;
+    }
+
+    .method-selector button {
+        background: none;
+        border: none;
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        font-weight: 700;
+        color: #666;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+    }
+
+    .method-selector button.active {
+        color: #000;
+        border-bottom: 4px solid #000;
+    }
+
+    .status-display {
+        font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+        font-size: 0.85rem;
+        margin-bottom: 1.5rem;
+        color: #000 !important;
+        background: #f4f4f4;
+        padding: 1rem;
+        text-align: left;
+    }
+
+    .status-label {
+        font-weight: 700;
+        color: #444;
+    }
+
+    .status-value {
+        color: #000;
+    }
+
+    .progress-bar-bg {
+        height: 12px;
+        background-color: #f0f0f0;
+        margin-bottom: 1rem;
+        border: 1px solid #000;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background-color: #000;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .progress-percentage {
+        display: block;
+        margin-top: 5px;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #000;
+        text-align: right;
+    }
+
+    .log-window {
+        margin-top: 3rem;
+        border: 1px solid #000;
+    }
+
+    .log-header {
+        background-color: #000;
+        color: #fff;
+        padding: 0.5rem 1rem;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .log-content {
+        height: 250px;
+        padding: 1.5rem;
+        font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+        font-size: 0.85rem;
+        line-height: 1.4;
+        overflow-y: auto;
+        background-color: #fff;
+        color: #000;
+    }
+
+    .log-entry {
+        border-bottom: 1px solid #f4f4f4;
+        padding: 4px 0;
+    }
+
+    .demo-button {
+        margin-top: 2.5rem;
+        background: #000;
+        color: #fff;
+        border: 1px solid #000;
+        padding: 1rem 3rem;
+        cursor: pointer;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        transition: all 0.2s;
+    }
+
+    .demo-button:hover:not(:disabled) {
+        background: #333;
+        transform: translateY(-2px);
+    }
+
+    .demo-button:disabled {
+        background: #ccc;
+        border-color: #ccc;
+        cursor: not-allowed;
+    }

@@ -1,0 +1,23 @@
+# Build step #1: react
+FROM node:19-alpine AS build-step
+WORKDIR /frontend_react
+ENV PATH /frontend_react/node_modules/.bin:$PATH
+COPY ./frontend_react .
+RUN yarn install
+RUN yarn build
+
+# Build step #2: nginx
+FROM nginx:stable-alpine
+COPY --from=build-step /frontend_react/build /usr/share/nginx/html
+
+# Copy the new split configs to a template directory
+COPY --from=build-step /frontend_react/infra/nginx_http.conf /etc/nginx/templates/
+COPY --from=build-step /frontend_react/infra/nginx_https.conf /etc/nginx/templates/
+COPY --from=build-step /frontend_react/infra/common_routes.conf /etc/nginx/
+COPY --from=build-step /frontend_react/infra/entrypoint.sh /usr/local/bin/
+
+# Ensure the script is executable
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Run the entrypoint script
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

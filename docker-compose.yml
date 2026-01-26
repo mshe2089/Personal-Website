@@ -2,13 +2,13 @@ services:
   core:
     build:
       context: .
-      dockerfile: ./flaskr/dockerfile.flaskr
+      dockerfile: ./server_fastapi/dockerfile.flaskr
     image: personal-website-api
     restart: always
   api:
     build:
       context: .
-      dockerfile: ./reactf/infra/dockerfile.reactf
+      dockerfile: ./frontend_react/infra/dockerfile.reactf
     image: personal-website-client
     restart: always
     ports:

@@ -3,7 +3,7 @@ import { routeRegistry } from './registry/registry';
 
 function App() {
   return (
-    <>
+    <div className="App">
       <Routes>
         {routeRegistry.map((route) => (
           <Route
@@ -13,7 +13,7 @@ function App() {
           />
         ))}
       </Routes>
-    </>
+    </div>
   );
 }
 
