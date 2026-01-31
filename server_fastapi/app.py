@@ -27,17 +27,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/api/SATsolver_script")
+@app.get("/api/v1/SATsolver_script")
 async def sat_solver_script(formula: str = Header(...)):
     """
     SAT solver endpoint that takes a 'formula' from headers.
+    Returns structured JSON with truth table and satisfiability info.
     """
-    print(f"Request: /api/SATsolver_script with formula: {formula}")
+    print(f"Request: /api/v1/SATsolver_script with formula: {formula}")
     decoded_formula = unquote(formula)
     result = SATsolve(decoded_formula)
-    return {"result": result}
+    return result  # FastAPI auto-serializes dict to JSON
 
-@app.get("/api/stream_progress")
+
+@app.get("/api/v1/stream_progress")
 async def stream_progress():
     """
     SSE endpoint that streams progress of a dummy heavy task.
@@ -50,7 +52,7 @@ async def stream_progress():
     
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 
-@app.websocket("/ws/progress")
+@app.websocket("/api/v1/ws/progress")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     try:
@@ -69,17 +71,17 @@ async def carry_out_heavy_task(task_id: str):
         tasks_status[task_id] = {"progress": i, "status": f"Method: Polling | Progress: {i}%"}
     tasks_status[task_id]["status"] = "Task 100% Complete!"
 
-@app.post("/api/task/start")
+@app.post("/api/v1/task/start")
 async def start_background_task(background_tasks: BackgroundTasks):
     task_id = str(uuid.uuid4())
     background_tasks.add_task(carry_out_heavy_task, task_id)
     return {"task_id": task_id}
 
-@app.get("/api/task/status/{task_id}")
+@app.get("/api/v1/task/status/{task_id}")
 async def get_task_status(task_id: str):
     return tasks_status.get(task_id, {"progress": 0, "status": "Task Not Found"})
 
-@app.get("/api")
+@app.get("/api/v1")
 async def ping():
     """
     Health check endpoint.

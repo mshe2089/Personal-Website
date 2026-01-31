@@ -2,8 +2,13 @@
 FROM node:19-alpine AS build-step
 WORKDIR /frontend_react
 ENV PATH /frontend_react/node_modules/.bin:$PATH
-COPY ./frontend_react .
+
+# Copy manifest files first to leverage Docker layer caching
+COPY ./frontend_react/package.json ./frontend_react/yarn.lock* ./
 RUN yarn install
+
+# Copy the rest of the source code and build
+COPY ./frontend_react .
 RUN yarn build
 
 # Build step #2: nginx

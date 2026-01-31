@@ -1,9 +1,22 @@
 def SATsolve(input):
-    #Funcs
-    def dec_to_bin(x):
-        return list(bin(x)[2:].zfill(len(variables)))
+    """
+    SAT Solver that returns structured JSON response.
+    
+    Returns:
+        dict: {
+            "formula": str,
+            "variables": list[str],
+            "truth_table": list[dict],
+            "satisfiable": bool,
+            "satisfying_assignments": list[dict]
+        }
+        OR {"error": str, "formula": str} on error
+    """
+    
+    def dec_to_bin(x, num_vars):
+        return list(bin(x)[2:].zfill(num_vars))
 
-    def test(formula, assignment):
+    def test(formula, assignment, variables):
         class BadFormulaException(Exception):
             pass
 
@@ -74,12 +87,12 @@ def SATsolve(input):
         if len(formula_stack[-1]) > 1:
             evalClause()
 
-        return str(formula_stack[-1].pop())
+        return formula_stack[-1].pop()
 
 
-    #Main printing
-
-    if not input: return "No formula"
+    # Main logic
+    if not input:
+        return {"error": "No formula provided", "formula": ""}
 
     symbols = set(['∨','¬','∧','→','↔','(',')'])
     variables = []
@@ -91,26 +104,40 @@ def SATsolve(input):
             variables.append(i)
 
     variables.sort()
-    last_assignment = 2**len(variables)
+    num_assignments = 2**len(variables)
 
-    ans = ""
-    ans += ("Formula " + input + "\n")
-    ans += ("---" * (len(variables) + 3) + "\n")
+    # Build truth table
+    truth_table = []
+    satisfying_assignments = []
 
-    for i in variables:
-        ans += (" " + i + " ")
-    ans += ("   Result\n")
-
-    ans += ("---" * (len(variables) + 3) + "\n")
-    for i in range(last_assignment):
+    for i in range(num_assignments):
         try:
-            ans += (" " + "  ".join(dec_to_bin(i)) + "  =   " + test(formula, dec_to_bin(i)) + "\n")
+            binary_assignment = dec_to_bin(i, len(variables))
+            result = test(formula, binary_assignment, variables)
+            
+            # Create row dictionary
+            row = {}
+            for var, val in zip(variables, binary_assignment):
+                row[var] = bool(int(val))
+            row['result'] = bool(result)
+            
+            truth_table.append(row)
+            
+            # Track satisfying assignments
+            if result == 1:
+                satisfying_assignment = {var: bool(int(val)) for var, val in zip(variables, binary_assignment)}
+                satisfying_assignments.append(satisfying_assignment)
+                
         except:
-            return "Formula is incorrectly formatted.\n"
+            return {"error": "Formula is incorrectly formatted", "formula": input}
 
-    ans += ("---" * (len(variables) + 3) + "\n")
-
-    return ans
+    return {
+        "formula": input,
+        "variables": variables,
+        "truth_table": truth_table,
+        "satisfiable": len(satisfying_assignments) > 0,
+        "satisfying_assignments": satisfying_assignments
+    }
 
 
 '''
@@ -118,6 +145,7 @@ DEBUG
 '''
 
 if __name__ == "__main__":
-    print(SATsolve("¬(((((¬a ∧ ¬b) ∧ c) ∨ ((¬a ∧ b) ∧ ¬c)) ∨ ((a ∧ ¬b) ∧ ¬c)) ∨  ((a ∧ b) ∧ c))"))
+    import json
+    print(json.dumps(SATsolve("¬(((((¬a ∧ ¬b) ∧ c) ∨ ((¬a ∧ b) ∧ ¬c)) ∨ ((a ∧ ¬b) ∧ ¬c)) ∨  ((a ∧ b) ∧ c))"), indent=2))
+    print(json.dumps(SATsolve("((x ∨ ¬(¬y ∨ (z ∧ ¬z)) ∨ w))"), indent=2))
 
-    print(SATsolve("((x ∨ ¬(¬y ∨ (z ∧ ¬z)) ∨ w))"))

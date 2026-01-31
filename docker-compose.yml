@@ -22,3 +22,14 @@ services:
     environment:
       - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
     restart: always
+
+  rust:
+    build:
+      context: ./server_rust
+      dockerfile: Dockerfile
+    image: personal-website-rust
+    restart: always
+
+  redis:
+    image: redis:alpine
+    restart: always
