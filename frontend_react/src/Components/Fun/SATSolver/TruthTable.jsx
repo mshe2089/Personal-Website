@@ -4,7 +4,7 @@ import React from 'react';
  * View Component: TruthTable
  * Displays a beautiful, theme-aware truth table
  */
-const TruthTable = ({ variables, truthTable }) => {
+export const TruthTable = ({ variables, truthTable }) => {
     if (!truthTable || truthTable.length === 0) return null;
 
     return (
@@ -32,8 +32,8 @@ const TruthTable = ({ variables, truthTable }) => {
                             <tr
                                 key={index}
                                 className={`${isSatisfying
-                                        ? 'bg-accent-primary/10 font-semibold'
-                                        : 'bg-primary'
+                                    ? 'bg-accent-primary/10 font-semibold'
+                                    : 'bg-primary'
                                     } hover:bg-tertiary transition-colors`}
                             >
                                 {variables.map((variable) => (
@@ -56,4 +56,4 @@ const TruthTable = ({ variables, truthTable }) => {
     );
 };
 
-export default TruthTable;
+// export default TruthTable;

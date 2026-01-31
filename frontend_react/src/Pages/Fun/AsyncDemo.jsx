@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAsyncDemo } from '../../hooks/useAsyncDemo';
-import { MethodSelector, ProgressBar, LogWindow } from '../../Components/AsyncDemo/AsyncDemoViews';
+import { MethodSelector, ProgressBar, LogWindow } from '../../Components/Fun/AsyncDemo/AsyncDemoViews';
 import PageTemplate from '../../Components/Common/PageTemplate';
 
 const AsyncDemo = () => {

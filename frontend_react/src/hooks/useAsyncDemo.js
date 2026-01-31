@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { usePolling } from './usePolling';
 import { useSSE } from './useSSE';
-import { useWebSocket } from './useWebSocket';
+import { useProgressWebSocket } from './useProgressWebSocket';
 
 /**
  * useAsyncDemo: Master Controller Hook
@@ -21,7 +21,7 @@ export const useAsyncDemo = () => {
     // Instantiate all hooks with correct endpoints
     const polling = usePolling(1000); // Poll every 1 second
     const sse = useSSE('/api/v1/stream_progress'); // SSE endpoint
-    const ws = useWebSocket('/api/v1/ws/progress'); // WebSocket path
+    const ws = useProgressWebSocket('/api/v1/ws/progress'); // WebSocket path
 
     // Determine current active controller based on method
     const getActiveController = () => {

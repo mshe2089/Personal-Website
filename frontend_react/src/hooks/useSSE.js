@@ -1,5 +1,4 @@
 import { useState, useCallback, useRef } from 'react';
-import { createSSEConnection } from '../api/SSEApi';
 
 /**
  * Controller: SSE Hook

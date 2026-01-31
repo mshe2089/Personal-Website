@@ -4,7 +4,7 @@ import React from 'react';
  * View Component: SatisfiabilityBadge
  * Visual indicator for SAT/UNSAT status
  */
-const SatisfiabilityBadge = ({ satisfiable, count }) => {
+export const SatisfiabilityBadge = ({ satisfiable, count }) => {
     if (satisfiable) {
         return (
             <div className="inline-flex items-center gap-sm px-lg py-sm bg-green-100 dark:bg-green-900/30 border-2 border-green-500 dark:border-green-600 rounded text-green-800 dark:text-green-300 font-bold uppercase tracking-wide text-sm">
@@ -27,4 +27,4 @@ const SatisfiabilityBadge = ({ satisfiable, count }) => {
     );
 };
 
-export default SatisfiabilityBadge;
+// export default SatisfiabilityBadge;

@@ -1,7 +1,7 @@
 import React from "react";
 import { useSATSolver } from "../../hooks/useSATSolver";
-import SolverControls from "../../Components/SATSolver/SolverControls";
-import SolverResults from "../../Components/SATSolver/SolverResults";
+import SolverControls from "../../Components/Fun/SATSolver/SolverControls";
+import SolverResults from "../../Components/Fun/SATSolver/SolverResults";
 import PageTemplate from "../../Components/Common/PageTemplate";
 
 function SATSolver() {

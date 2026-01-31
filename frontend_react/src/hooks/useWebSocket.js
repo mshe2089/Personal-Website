@@ -1,50 +1,70 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { createWebSocketConnection } from '../api/WSApi';
 
 /**
- * Controller: WebSocket Hook
- * Manages state for WebSocket communication
- * @param {string} path - The WebSocket path (e.g., /api/v1/ws/progress)
+ * Controller: Generic WebSocket Hook
+ * Manages state for WebSocket communication in a modular way.
+ * 
+ * Handles the raw connection state while allowing specialized hooks
+ * to define their own message processing logic.
  */
-export const useWebSocket = (path) => {
-    const [progress, setProgress] = useState(0);
-    const [status, setStatus] = useState('Idle');
+export const useWebSocket = (path, options = {}) => {
+    const [status, setStatus] = useState('IDLE');
     const [isRunning, setIsRunning] = useState(false);
     const connectionRef = useRef(null);
 
-    const start = useCallback((onMessage) => {
+    const start = useCallback((callbacks = {}) => {
         setIsRunning(true);
-        setProgress(0);
-        setStatus('Connecting...');
+        setStatus('CONNECTING');
+
+        const { onMessage, onError, onClose, onOpen } = callbacks;
 
         connectionRef.current = createWebSocketConnection(path, {
-            onMessage: (data) => {
-                setProgress(data.progress);
-                setStatus(data.status);
-
-                if (onMessage) onMessage(data);
-
-                if (data.progress === 100) {
-                    connectionRef.current?.close();
-                    setIsRunning(false);
-                }
+            onOpen: () => {
+                setStatus('OPEN');
+                if (onOpen) onOpen();
+                if (options.onOpen) options.onOpen();
             },
-            onError: () => {
-                setStatus('WS Error');
+            onMessage: (data) => {
+                if (onMessage) onMessage(data);
+                if (options.onMessage) options.onMessage(data);
+            },
+            onError: (err) => {
+                setStatus('ERROR');
                 setIsRunning(false);
+                if (onError) onError(err);
+                if (options.onError) options.onError(err);
             },
             onClose: () => {
+                setStatus('CLOSED');
                 setIsRunning(false);
+                if (onClose) onClose();
+                if (options.onClose) options.onClose();
             }
         });
-    }, [path]);
+    }, [path, options]);
 
     const stop = useCallback(() => {
         if (connectionRef.current) {
             connectionRef.current.close();
-            setIsRunning(false);
+        }
+        setIsRunning(false);
+    }, []);
+
+    const send = useCallback((data) => {
+        if (connectionRef.current) {
+            connectionRef.current.send(data);
         }
     }, []);
 
-    return { progress, status, isRunning, start, stop };
+    // Auto-cleanup on unmount to prevent memory leaks in the Lab
+    useEffect(() => {
+        return () => {
+            if (connectionRef.current) {
+                connectionRef.current.close();
+            }
+        };
+    }, []);
+
+    return { status, isRunning, start, stop, send };
 };

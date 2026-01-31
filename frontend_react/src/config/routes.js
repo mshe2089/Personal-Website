@@ -2,7 +2,7 @@ import Landing from '../Pages/Landing';
 import SATSolver from '../Pages/Fun/SATSolver';
 import AsyncDemo from '../Pages/Fun/AsyncDemo';
 import PostScarcity from '../Pages/Thoughts/PostScarcity';
-import RustPlayground from '../Pages/RustPlayground';
+import RustPlayground from '../Pages/Labs/RustPlayground';
 
 export const routeRegistry = [
     {
@@ -24,7 +24,7 @@ export const routeRegistry = [
         component: RustPlayground,
         name: "Rust Node",
         hidden: false,
-        category: "Technical"
+        category: "Labs"
     },
     {
         path: "/tools/SATSolver",

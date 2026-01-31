@@ -1,39 +1,27 @@
-# The Daniel Lab (Server Edition)
+# Introduction
 
-This is a high-performance, minimalist Technical Journal designed to showcase experiments in Machine Learning, Graphics (WGPU), Game Development, and Security.
+Personal website for fun.
 
 ## Architecture
 
-The Lab follows an **Efficient Minimalist** architecture optimized for the **Server** (Dell Inspiron 7590). It is structured as an outbound-ready "Zero-Fiddle" deployment using Docker and Cloudflare Tunnels.
+Containerized stack unified under an NGINX gateway.
 
-### Gateway & Delivery
+*   **Gateway**: NGINX handling SSL termination and proxying to `/api/v1/` services.
+*   **Frontend**: React (Vite) application with a centralized routing registry.
+*   **Systems Node**: Rust (Axum/Tokio) for code execution and interactive terminal streams via WebSockets.
+*   **Logic Node**: Python (FastAPI) for stateless utilities and SAT solving.
+*   **State**: Redis for cross-service orchestration.
+*   **Connectivity**: Cloudflare Tunnel for outbound-only ingress to muqing.dev.
 
-*   **API Gateway (NGINX)**: The authoritative sentry. It handles SSL termination, static file delivery, and reverse-proxying through a **Unified Gateway** model (`infra/common_routes.conf`).
-*   **Frontend (React/Vite)**: A high-performance, containerized UI that consumes a centralized **Routing Registry** (`src/registry/registry.js`).
-*   **Logic (Python/Flask)**: The computational core handling technical tasks like SAT solving.
+## Setup
 
-### Portability Layers
-
-1.  **Cloudflare Tunnel**: Outbound-only connectivity to `muqing.dev` without port forwarding.
-2.  **Infrastructure Isolation**: All delivery pipeline assets are separated into `infra/` directories within their respective service nodes.
-
-## Quick Start
-
-1.  **Configure Environment**:
-    ```bash
-    cp .env.example .env
-    # Add your CLOUDFLARE_TUNNEL_TOKEN to .env
-    ```
-2.  **Launch**:
-    ```bash
-    docker compose up --build -d
-    ```
+```bash
+cp .env.example .env
+docker compose up --build -d
+```
 
 ## Documentation
 
-- [Phase Roadmap](./task.md)
-- [Implementation Plan](./implementation_plan.md)
-- [Deployment Walkthrough](./walkthrough.md)
+- [Project Roadmap](./task.md)
+- [System Walkthrough](./walkthrough.md)
 
----
-*Architectural integrity maintained by Anti*

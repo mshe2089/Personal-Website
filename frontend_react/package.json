@@ -9,6 +9,8 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.8.1",
     "react-syntax-highlighter": "^15.5.0",
+    "react-simple-code-editor": "^0.11.0",
+    "prismjs": "^1.29.0",
     "framer-motion": "^10.12.16",
     "web-vitals": "^2.1.4"
   },

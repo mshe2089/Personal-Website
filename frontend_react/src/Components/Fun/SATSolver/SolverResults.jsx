@@ -1,7 +1,6 @@
 import React from 'react';
-import TruthTable from './TruthTable';
-import SatisfiabilityBadge from './SatisfiabilityBadge';
-
+import { SatisfiabilityBadge } from './SatisfiabilityBadge';
+import { TruthTable } from './TruthTable';
 /**
  * View Component: SolverResults
  * Displays structured SAT solver results with beautiful UI

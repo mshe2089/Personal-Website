@@ -22,6 +22,7 @@ function NavBar() {
   const mainLinks = routeRegistry.filter(r => !r.hidden && r.category === "Main");
   const funLinks = routeRegistry.filter(r => !r.hidden && r.category === "Fun");
   const thoughtLinks = routeRegistry.filter(r => !r.hidden && r.category === "Thoughts");
+  const labsLinks = routeRegistry.filter(r => !r.hidden && r.category === "Labs");
 
   const toggleDropdown = (name) => {
     setActiveDropdown(activeDropdown === name ? null : name);
@@ -70,6 +71,29 @@ function NavBar() {
           </Link>
         ))}
 
+        {/* Labs Dropdown */}
+        <div className="relative">
+          <button
+            className="bg-transparent border-none cursor-pointer text-primary font-medium text-sm lg:text-base flex items-center gap-xs hover:text-secondary p-0"
+            onClick={() => toggleDropdown('labs')}
+          >
+            Labs <span className="text-xs">▼</span>
+          </button>
+          {activeDropdown === 'labs' && (
+            <div className="absolute top-[120%] left-1/2 -translate-x-1/2 bg-primary border border-strong min-w-[180px] shadow-lg flex flex-col z-20 animate-in fade-in zoom-in-95 duration-200">
+              {labsLinks.map(route => (
+                <Link
+                  key={route.path}
+                  to={route.path}
+                  className="text-primary no-underline p-md text-sm hover:bg-tertiary block border-b border-strong last:border-none transition-colors"
+                >
+                  {route.name}
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Thoughts Dropdown */}
         <div className="relative">
           <button
@@ -79,7 +103,7 @@ function NavBar() {
             Thoughts <span className="text-xs">▼</span>
           </button>
           {activeDropdown === 'thoughts' && (
-            <div className="absolute top-[120%] left-0 lg:left-1/2 lg:-translate-x-1/2 bg-primary border border-strong min-w-[220px] shadow-lg flex flex-col z-20 animate-in fade-in zoom-in-95 duration-200">
+            <div className="absolute top-[120%] left-1/2 -translate-x-1/2 bg-primary border border-strong min-w-[220px] shadow-lg flex flex-col z-20 animate-in fade-in zoom-in-95 duration-200">
               {thoughtLinks.map(route => (
                 <Link
                   key={route.path}
@@ -102,7 +126,7 @@ function NavBar() {
             Fun <span className="text-xs">▼</span>
           </button>
           {activeDropdown === 'fun' && (
-            <div className="absolute top-[120%] right-0 bg-primary border border-strong min-w-[180px] shadow-lg flex flex-col z-20 animate-in fade-in zoom-in-95 duration-200">
+            <div className="absolute top-[120%] left-1/2 -translate-x-1/2 bg-primary border border-strong min-w-[180px] shadow-lg flex flex-col z-20 animate-in fade-in zoom-in-95 duration-200">
               {funLinks.map(route => (
                 <Link
                   key={route.path}
