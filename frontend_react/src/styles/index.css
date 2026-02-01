@@ -90,7 +90,7 @@ body {
 
 @layer components {
   .page-container {
-    @apply max-w-[800px] mx-auto my-3xl px-xl text-left;
+    @apply w-full max-w-5xl mx-auto my-3xl px-xl text-left;
   }
 
   .h1-primary {

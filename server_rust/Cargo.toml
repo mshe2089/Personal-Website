@@ -14,3 +14,5 @@ tower = { version = "0.4", features = ["full"] }
 tower-http = { version = "0.5", features = ["cors"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+nix = { version = "0.27", features = ["user", "resource", "process"] }
+uuid = { version = "1.6", features = ["v4"] }

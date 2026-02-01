@@ -16,8 +16,9 @@ const AsyncDemo = () => {
 
     return (
         <PageTemplate title="Async Demo" date="Jan 2026">
+
             <p className="italic text-secondary mb-10 text-left border-l-[3px] border-default pl-6">
-                Explore the three pillars of real-time Python connectivity!
+                "The three pillars of real-time communications!"
             </p>
 
             <div className="card-brutalist">
@@ -60,7 +61,7 @@ const Documentation = () => (
             <b className="section-label">Server-Sent Events (SSE)</b>
             <p className="text-body">
                 SSE allows the server to push real-time updates to the web page over a single HTTP connection.
-                It's unidirectional (Server to Client) and standard-based.
+                It's unidirectional and standard-based.
             </p>
         </div>
 

@@ -10,7 +10,7 @@ const PostScarcity = () => {
         <PageTemplate
             title="The Horizon of Absolute Leisure: Society Beyond Labor"
             date="Jan 31, 2026"
-            author="By Antigravity"
+            author="By Gemini 3"
         >
             <div className="text-body leading-relaxed space-y-xl">
                 <p>

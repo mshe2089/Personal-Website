@@ -22,7 +22,7 @@ export const routeRegistry = [
     {
         path: "/tools/rust-playground",
         component: RustPlayground,
-        name: "Rust Node",
+        name: "Rust Playground",
         hidden: false,
         category: "Labs"
     },

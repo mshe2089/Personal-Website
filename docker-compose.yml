@@ -29,6 +29,20 @@ services:
       dockerfile: Dockerfile
     image: personal-website-rust
     restart: always
+    security_opt:
+      - no-new-privileges:true
+      - seccomp=./server_rust/seccomp-profile.json
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETUID
+      - SETGID
+    read_only: true
+    tmpfs:
+      - /tmp:noexec,nosuid,size=500M
+    mem_limit: 512M
+    cpus: 1.0
+    pids_limit: 100
 
   redis:
     image: redis:alpine

@@ -25,31 +25,31 @@ fn main() {
         isRunning,
         execute,
         sendInput,
+        stop,
     } = useRustTerminal();
 
     return (
         <PageTemplate
-            title="Rust Node"
+            title="Rust Playground"
             date="Jan 2026"
         >
-            <div className="mb-xl">
-                <p className="text-body italic border-l-4 border-accent-secondary pl-md">
-                    "This won't pose a security risk at all"
-                </p>
-            </div>
+            <p className="italic text-secondary mb-10 text-left border-l-[3px] border-default pl-6">
+                "This won't pose a security risk at all"
+            </p>
 
             <div className="mb-md">
                 <p className="text-body text-left">
-                    Compile and execute Rust code directly on the server's rust node.
+                    Compile and execute rust code directly on the server's rust node.
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-xl items-start">
+            <div className="flex flex-col gap-xl">
                 <CodeEditor
                     code={code}
                     setCode={setCode}
                     isLoading={isRunning}
                     onExecute={() => execute(code)}
+                    onStop={stop}
                     status={isRunning ? "RUNNING" : "IDLE"}
                 />
                 <TerminalOutput

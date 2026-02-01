@@ -59,11 +59,17 @@ export const useRustTerminal = () => {
         ws.send(text + '\n');
     }, [ws]);
 
+    const stop = useCallback(() => {
+        ws.stop();
+        setOutput(prev => prev + '\n>> PROCESS KILLED BY USER\n');
+        setIsRunning(false);
+    }, [ws]);
+
     return {
         output,
         isRunning,
         execute,
         sendInput,
-        stop: ws.stop
+        stop
     };
 };

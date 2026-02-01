@@ -17,6 +17,11 @@ function SATSolver() {
   return (
     <PageTemplate title="Truth table generator" date="Jan 2026">
       <div className="mb-md">
+
+        <p className="italic text-secondary mb-10 text-left border-l-[3px] border-default pl-6">
+          "Filthy cheat tool for PHIL1012"
+        </p>
+
         <p className="text-body">
           This simple tool will brute-force the entire truth table of your boolean SAT formula.
           Made to test out asynchronous page updates.
