@@ -23,27 +23,51 @@ services:
       - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
     restart: always
 
+  # Rust web server - handles HTTP/WebSocket endpoints
   rust:
     build:
       context: ./server_rust
       dockerfile: Dockerfile
-    image: personal-website-rust
+    image: personal-website-rust-server
     restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # Docker API access for spawning runners
+    environment:
+      - RUNNER_IMAGE=personal-website-rust-runner
+      - RUNNER_NETWORK=personal-website_rust-execution
+    networks:
+      - default
+      - rust-execution
+
+  # Runner template - ephemeral containers spawned dynamically by rust-server
+  # This service builds the image but doesn't run continuously
+  rust-runner:
+    build:
+      context: ./server_rust
+      dockerfile: Dockerfile.runner
+    image: personal-website-rust-runner
+    profiles:
+      - manual # Prevents auto-start, only used as template image
     security_opt:
       - no-new-privileges:true
       - seccomp=./server_rust/seccomp-profile.json
     cap_drop:
       - ALL
-    cap_add:
-      - SETUID
-      - SETGID
     read_only: true
     tmpfs:
-      - /tmp:noexec,nosuid,size=500M
-    mem_limit: 512M
-    cpus: 1.0
-    pids_limit: 100
+      - /workspace:exec,nosuid,size=100M # Writable workspace for code compilation and execution
+      - /tmp:exec,nosuid,size=50M # Rustc needs /tmp for intermediate files
+    mem_limit: 128M
+    cpus: 0.5
+    pids_limit: 50
+    network_mode: none # No network access for user code
 
   redis:
     image: redis:alpine
     restart: always
+
+networks:
+  rust-execution:
+    internal: true # Isolated network for runner containers

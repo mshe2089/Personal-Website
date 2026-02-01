@@ -16,3 +16,6 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 nix = { version = "0.27", features = ["user", "resource", "process"] }
 uuid = { version = "1.6", features = ["v4"] }
+bollard = "0.16"  # Docker API client for container orchestration
+futures-util = "0.3"  # Async stream utilities
+time = "=0.3.36"  # Pin to avoid edition2024 requirement

@@ -1,0 +1,21 @@
+# Minimal runner image for executing user-submitted Rust code
+FROM rust:slim
+
+WORKDIR /workspace
+
+# Install only essential dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create unprivileged user for code execution
+RUN useradd -m -u 1000 -s /bin/bash rustuser
+
+# Create writable workspace directory
+RUN mkdir -p /workspace && chown rustuser:rustuser /workspace
+
+# Switch to unprivileged user
+USER rustuser
+
+# Default command (will be overridden by Docker API)
+CMD ["/bin/bash"]

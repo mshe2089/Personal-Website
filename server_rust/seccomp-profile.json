@@ -169,6 +169,7 @@
                 "socket",
                 "socketpair",
                 "stat",
+                "statx",
                 "statfs",
                 "symlink",
                 "symlinkat",

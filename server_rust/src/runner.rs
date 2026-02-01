@@ -1,25 +1,15 @@
 use axum::extract::ws::{Message, WebSocket};
+use bollard::container::{
+    Config, CreateContainerOptions, LogOutput, RemoveContainerOptions, StartContainerOptions,
+};
+use bollard::exec::{CreateExecOptions, StartExecResults};
+use bollard::Docker;
+use futures_util::{SinkExt, StreamExt};
 use serde::{Deserialize, Serialize};
-use std::fs;
-use std::os::unix::process::CommandExt;
-use std::process::Stdio;
-use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
-use tokio::process::Command;
-use nix::sys::resource::{setrlimit, Resource};
+use std::env;
+use std::time::Duration;
+use tokio::io::AsyncWriteExt;
 use uuid::Uuid;
-
-/// Security: Set resource limits for child processes
-/// This prevents fork bombs, memory exhaustion, and CPU hogging
-unsafe fn set_child_rlimits() {
-    // CPU time limit: 10 seconds
-    let _ = setrlimit(Resource::RLIMIT_CPU, 10, 10);
-    // Virtual memory limit: 128MB
-    let _ = setrlimit(Resource::RLIMIT_AS, 128_000_000, 128_000_000);
-    // Max processes: 20
-    let _ = setrlimit(Resource::RLIMIT_NPROC, 20, 20);
-    // Max file size: 10MB
-    let _ = setrlimit(Resource::RLIMIT_FSIZE, 10_000_000, 10_000_000);
-}
 
 #[derive(Deserialize)]
 pub struct ExecuteRequest {
@@ -45,165 +35,352 @@ async fn send_event(socket: &mut WebSocket, event: WsEvent) {
     }
 }
 
-/// Execute user-submitted Rust code in a sandboxed environment
-/// 
+/// Execute user-submitted Rust code in an ephemeral Docker container
+///
 /// Security features:
-/// - Isolated workspace per execution
-/// - Runs as unprivileged user (UID 1000)
-/// - Resource limits (CPU, memory, processes, file size)
-/// - Automatic cleanup
+/// - Isolated container per execution
+/// - No network access
+/// - Read-only filesystem (except /workspace tmpfs)
+/// - Resource limits (CPU, memory, processes)
+/// - Automatic cleanup after execution
+/// - Seccomp profile restrictions
 pub async fn execute_user_code(mut socket: WebSocket) {
-    send_event(&mut socket, WsEvent::System("RUST EXECUTION NODE ACTIVE".into())).await;
+    send_event(
+        &mut socket,
+        WsEvent::System("RUST EXECUTION NODE ACTIVE".into()),
+    )
+    .await;
 
     // Wait for the initial payload containing the source code
     let code = match socket.recv().await {
-        Some(Ok(Message::Text(text))) => {
-            match serde_json::from_str::<ExecuteRequest>(&text) {
-                Ok(req) => req.code,
-                Err(_) => {
-                    send_event(&mut socket, WsEvent::System("ERROR: Invalid JSON payload".into())).await;
-                    return;
-                }
+        Some(Ok(Message::Text(text))) => match serde_json::from_str::<ExecuteRequest>(&text) {
+            Ok(req) => req.code,
+            Err(_) => {
+                send_event(
+                    &mut socket,
+                    WsEvent::System("ERROR: Invalid JSON payload".into()),
+                )
+                .await;
+                return;
             }
-        }
+        },
         _ => return,
     };
 
-    // Create isolated workspace for this execution
-    let execution_id = Uuid::new_v4();
-    let workspace_dir = format!("/tmp/rust-exec-{}", execution_id);
+    // Connect to Docker daemon
+    let docker = match Docker::connect_with_socket_defaults() {
+        Ok(d) => d,
+        Err(e) => {
+            send_event(
+                &mut socket,
+                WsEvent::System(format!("ERROR: Failed to connect to Docker: {}", e)),
+            )
+            .await;
+            return;
+        }
+    };
+
+    // Get configuration from environment
+    let runner_image = env::var("RUNNER_IMAGE").unwrap_or_else(|_| "personal-website-rust-runner".to_string());
+    let _runner_network = env::var("RUNNER_NETWORK").ok();
     
-    if let Err(e) = fs::create_dir_all(&workspace_dir) {
-        send_event(&mut socket, WsEvent::System(format!("ERROR: Failed to create workspace: {}", e))).await;
+    let execution_id = Uuid::new_v4();
+    let container_name = format!("rust-exec-{}", execution_id);
+
+    // Create ephemeral container
+    let config = Config {
+        image: Some(runner_image.clone()),
+        user: Some("rustuser".to_string()),
+        cmd: Some(vec!["sleep".to_string(), "infinity".to_string()]),
+        working_dir: Some("/workspace".to_string()),
+        host_config: Some(bollard::models::HostConfig {
+            memory: Some(128 * 1024 * 1024), // 128MB
+            nano_cpus: Some(500_000_000),    // 0.5 CPU
+            pids_limit: Some(50),
+            network_mode: Some("none".to_string()), // No network access
+            readonly_rootfs: Some(true),
+            tmpfs: Some(
+                [
+                    ("/workspace".to_string(), "exec,nosuid,size=100M,uid=1000,gid=1000".to_string()),
+                    ("/tmp".to_string(), "exec,nosuid,size=100M,uid=1000,gid=1000".to_string()),
+                ]
+                .iter()
+                .cloned()
+                .collect(),
+            ),
+            security_opt: Some(vec![
+                "no-new-privileges:true".to_string(),
+            ]),
+            cap_drop: Some(vec!["ALL".to_string()]),
+            ..Default::default()
+        }),
+        ..Default::default()
+    };
+
+    let container = match docker
+        .create_container(
+            Some(CreateContainerOptions {
+                name: container_name.clone(),
+                platform: None,
+            }),
+            config,
+        )
+        .await
+    {
+        Ok(c) => c,
+        Err(e) => {
+            send_event(
+                &mut socket,
+                WsEvent::System(format!("ERROR: Failed to create container: {}", e)),
+            )
+            .await;
+            return;
+        }
+    };
+
+    // Start the container
+    if let Err(e) = docker
+        .start_container(&container.id, None::<StartContainerOptions<String>>)
+        .await
+    {
+        send_event(
+            &mut socket,
+            WsEvent::System(format!("ERROR: Failed to start container: {}", e)),
+        )
+        .await;
+        let _ = docker
+            .remove_container(
+                &container.id,
+                Some(RemoveContainerOptions {
+                    force: true,
+                    ..Default::default()
+                }),
+            )
+            .await;
         return;
     }
-    
-    let file_path = format!("{}/main.rs", workspace_dir);
-    let bin_path = format!("{}/main", workspace_dir);
 
-    if let Err(e) = tokio::fs::write(&file_path, &code).await {
-        send_event(&mut socket, WsEvent::System(format!("ERROR: Failed to write file: {}", e))).await;
-        let _ = fs::remove_dir_all(&workspace_dir);
-        return;
+    // Write source code to container
+    let file_path = "/workspace/main.rs";
+    let cat_command = format!("cat > {}", file_path);
+    let write_code_exec = CreateExecOptions {
+        cmd: Some(vec!["sh".to_string(), "-c".to_string(), cat_command]),
+        attach_stdin: Some(true),
+        attach_stdout: Some(true),
+        attach_stderr: Some(true),
+        ..Default::default()
+    };
+
+    let exec = match docker.create_exec(&container.id, write_code_exec).await {
+        Ok(e) => e,
+        Err(e) => {
+            send_event(
+                &mut socket,
+                WsEvent::System(format!("ERROR: Failed to write code: {}", e)),
+            )
+            .await;
+            cleanup_container(&docker, &container.id).await;
+            return;
+        }
+    };
+
+    if let StartExecResults::Attached { mut input, .. } =
+        docker.start_exec(&exec.id, None).await.unwrap()
+    {
+        let _ = input.write_all(code.as_bytes()).await;
+        let _ = input.shutdown().await;
     }
 
     send_event(&mut socket, WsEvent::System("COMPILING...".into())).await;
 
-    // Compile the user code
-    let compile_output = Command::new("rustc")
-        .arg(&file_path)
-        .arg("-o")
-        .arg(&bin_path)
-        .output()
-        .await;
+    // Compile the code
+    let compile_exec = CreateExecOptions {
+        cmd: Some(vec![
+            "rustc".to_string(),
+            file_path.to_string(),
+            "-o".to_string(),
+            "/workspace/main".to_string(),
+        ]),
+        attach_stdout: Some(true),
+        attach_stderr: Some(true),
+        ..Default::default()
+    };
 
-    match compile_output {
-        Ok(output) if output.status.success() => {
-            send_event(&mut socket, WsEvent::System("COMPILATION SUCCESSFUL. STARTING SESSION...\n".into())).await;
+    let compile = match docker.create_exec(&container.id, compile_exec).await {
+        Ok(e) => e,
+        Err(e) => {
+            send_event(
+                &mut socket,
+                WsEvent::System(format!("ERROR: Compilation setup failed: {}", e)),
+            )
+            .await;
+            cleanup_container(&docker, &container.id).await;
+            return;
+        }
+    };
 
-            // Spawn process with security hardening
-            let mut child = unsafe {
-                match Command::new(&bin_path)
-                    .stdin(Stdio::piped())
-                    .stdout(Stdio::piped())
-                    .stderr(Stdio::piped())
-                    .uid(1000)  // Run as rustuser
-                    .gid(1000)
-                    .pre_exec(|| {
-                        // Set resource limits before exec
-                        set_child_rlimits();
-                        Ok(())
-                    })
-                    .spawn() 
-                {
-                    Ok(c) => c,
-                    Err(e) => {
-                        send_event(&mut socket, WsEvent::System(format!("ERROR: Failed to spawn process: {}", e))).await;
-                        let _ = fs::remove_dir_all(&workspace_dir);
-                        return;
-                    }
+    if let StartExecResults::Attached { output, .. } =
+        docker.start_exec(&compile.id, None).await.unwrap()
+    {
+        let logs: Vec<_> = output.collect().await;
+        let mut compile_success = true;
+        let mut error_output = String::new();
+
+        for log in logs {
+            match log {
+                Ok(LogOutput::StdErr { message }) => {
+                    let text = String::from_utf8_lossy(&message).to_string();
+                    tracing::debug!("Compilation Stderr: {}", text);
+                    error_output.push_str(&text);
+                    compile_success = false;
                 }
-            };
+                Ok(LogOutput::StdOut { message }) => {
+                    let text = String::from_utf8_lossy(&message).to_string();
+                    tracing::debug!("Compilation Stdout: {}", text);
+                }
+                _ => {}
+            }
+        }
 
-            let mut stdin = child.stdin.take().expect("Failed to open stdin");
-            let mut stdout = BufReader::new(child.stdout.take().expect("Failed to open stdout"));
-            let mut stderr = BufReader::new(child.stderr.take().expect("Failed to open stderr"));
+        if !compile_success {
+            send_event(
+                &mut socket,
+                WsEvent::System(format!("COMPILATION ERROR:\n{}", error_output)),
+            )
+            .await;
+            cleanup_container(&docker, &container.id).await;
+            return;
+        }
+    }
 
-            // I/O multiplexing loop
+    send_event(
+        &mut socket,
+        WsEvent::System("COMPILATION SUCCESSFUL. STARTING SESSION...\n".into()),
+    )
+    .await;
+
+    // Execute the compiled binary with timeout
+    let run_exec = CreateExecOptions {
+        cmd: Some(vec!["/workspace/main".to_string()]),
+        attach_stdin: Some(true),
+        attach_stdout: Some(true),
+        attach_stderr: Some(true),
+        ..Default::default()
+    };
+
+    let run = match docker.create_exec(&container.id, run_exec).await {
+        Ok(e) => e,
+        Err(e) => {
+            send_event(
+                &mut socket,
+                WsEvent::System(format!("ERROR: Execution setup failed: {}", e)),
+            )
+            .await;
+            cleanup_container(&docker, &container.id).await;
+            return;
+        }
+    };
+
+    // Start execution with I/O streaming
+    match docker.start_exec(&run.id, None).await {
+        Ok(StartExecResults::Attached {
+            mut output,
+            mut input,
+        }) => {
+            // Split the websocket so we can use it concurrently
+            let (mut ws_sender, mut ws_receiver) = socket.split();
+            let start_time = std::time::Instant::now();
+            let timeout_duration = Duration::from_secs(10);
+
             loop {
-                let mut stdout_line = String::new();
-                let mut stderr_line = String::new();
+                let elapsed = start_time.elapsed();
+                if elapsed >= timeout_duration {
+                    let event = WsEvent::Exit("Process terminated: 10 second timeout exceeded".to_string());
+                    if let Ok(json) = serde_json::to_string(&event) {
+                        let _ = ws_sender.send(Message::Text(json)).await;
+                    }
+                    break;
+                }
 
                 tokio::select! {
-                    // Stream STDOUT from process to client
-                    res = stdout.read_line(&mut stdout_line) => {
-                        match res {
-                            Ok(0) | Err(_) => break,
-                            Ok(_) => {
-                                if let Ok(json) = serde_json::to_string(&WsEvent::Stdout(stdout_line)) {
-                                    if socket.send(Message::Text(json)).await.is_err() { break; }
+                    // Stream output from container to client
+                    log_opt = output.next() => {
+                        match log_opt {
+                            Some(Ok(LogOutput::StdOut { message })) => {
+                                let text = String::from_utf8_lossy(&message).to_string();
+                                if let Ok(json) = serde_json::to_string(&WsEvent::Stdout(text)) {
+                                    if ws_sender.send(Message::Text(json)).await.is_err() { break; }
                                 }
                             }
-                        }
-                    }
-                    // Stream STDERR from process to client
-                    res = stderr.read_line(&mut stderr_line) => {
-                        match res {
-                            Ok(0) | Err(_) => break,
-                            Ok(_) => {
-                                if let Ok(json) = serde_json::to_string(&WsEvent::Stderr(stderr_line)) {
-                                    if socket.send(Message::Text(json)).await.is_err() { break; }
+                            Some(Ok(LogOutput::StdErr { message })) => {
+                                let text = String::from_utf8_lossy(&message).to_string();
+                                if let Ok(json) = serde_json::to_string(&WsEvent::Stderr(text)) {
+                                    if ws_sender.send(Message::Text(json)).await.is_err() { break; }
                                 }
                             }
+                            Some(Ok(_)) => {} // Ignore other successful variants (StdIn, Console)
+                            Some(Err(_)) | None => break, // Exit loop when process finishes or stream breaks
                         }
                     }
-                    // Receive STDIN from client and forward to process
-                    msg = socket.recv() => {
+                    // Receive input from client and forward to container
+                    msg = ws_receiver.next() => {
                         match msg {
                             Some(Ok(Message::Text(text))) => {
-                                // Deserialize JSON string if present
                                 let input_bytes = if let Ok(decoded) = serde_json::from_str::<String>(&text) {
                                     decoded.into_bytes()
                                 } else {
                                     text.into_bytes()
                                 };
-                                
-                                if stdin.write_all(&input_bytes).await.is_err() { break; }
-                                if stdin.flush().await.is_err() { break; }
+                                if input.write_all(&input_bytes).await.is_err() { break; }
                             }
                             Some(Ok(Message::Close(_))) => {
-                                send_event(&mut socket, WsEvent::System(">> PROCESS KILLED BY USER".into())).await;
-                                let _ = child.kill().await;
+                                let event = WsEvent::System(">> PROCESS KILLED BY USER".into());
+                                if let Ok(json) = serde_json::to_string(&event) {
+                                    let _ = ws_sender.send(Message::Text(json)).await;
+                                }
                                 break;
                             }
                             _ => break,
                         }
                     }
-                    // Handle process exit
-                    status = child.wait() => {
-                        let exit_msg = match status {
-                            Ok(s) => format!("Process exited with status: {}", s),
-                            Err(e) => format!("Process failed: {}", e),
-                        };
-                        if let Ok(json) = serde_json::to_string(&WsEvent::Exit(exit_msg)) {
-                            let _ = socket.send(Message::Text(json)).await;
+                    // Overall timeout
+                    _ = tokio::time::sleep(timeout_duration.saturating_sub(elapsed)) => {
+                        let event = WsEvent::Exit("Process terminated: 10 second timeout exceeded".to_string());
+                        if let Ok(json) = serde_json::to_string(&event) {
+                            let _ = ws_sender.send(Message::Text(json)).await;
                         }
                         break;
                     }
                 }
             }
 
-            let _ = child.kill().await;
+            // Final exit message
+            let event = WsEvent::Exit("Process completed".to_string());
+            if let Ok(json) = serde_json::to_string(&event) {
+                let _ = ws_sender.send(Message::Text(json)).await;
+            }
         }
-        Ok(output) => {
-            let err_msg = String::from_utf8_lossy(&output.stderr).to_string();
-            send_event(&mut socket, WsEvent::System(format!("COMPILATION ERROR:\n{}", err_msg))).await;
-        }
-        Err(e) => {
-            send_event(&mut socket, WsEvent::System(format!("SYSTEM ERROR: {}", e))).await;
+        _ => {
+            send_event(
+                &mut socket,
+                WsEvent::System("ERROR: Failed to attach to execution".into()),
+            )
+            .await;
         }
     }
 
-    // Cleanup: Remove isolated workspace directory
-    let _ = fs::remove_dir_all(&workspace_dir);
+    // Cleanup
+    cleanup_container(&docker, &container.id).await;
+}
+
+async fn cleanup_container(docker: &Docker, container_id: &str) {
+    let _ = docker
+        .remove_container(
+            container_id,
+            Some(RemoveContainerOptions {
+                force: true,
+                ..Default::default()
+            }),
+        )
+        .await;
 }
