@@ -18,8 +18,9 @@ const PixelCanvas = ({ name, width = 64, height = 64 }) => {
     } = usePixelCanvas(name, width, height);
 
     return (
-        <div className="flex flex-col items-center gap-lg my-xl">
-            <div className="relative group p-xs bg-strong border-2 border-strong shadow-brutalist dark:shadow-brutalist-dark">
+        <div className="my-xl w-full">
+            <div className="mx-auto w-full max-w-[1024px] border border-strong bg-primary">
+                <div className="relative">
                 {!isLoaded && (
                     <div className="absolute inset-0 flex items-center justify-center bg-primary/50 backdrop-blur-sm z-10 font-serif lowercase">
                         Initializing...
@@ -29,10 +30,9 @@ const PixelCanvas = ({ name, width = 64, height = 64 }) => {
                     ref={canvasRef}
                     width={dimensions.width}
                     height={dimensions.height}
-                    className="image-pixelated cursor-crosshair bg-white"
+                    className="image-pixelated block h-auto w-full cursor-crosshair bg-white"
                     style={{
-                        width: dimensions.width * DISPLAY_SCALE,
-                        height: dimensions.height * DISPLAY_SCALE,
+                        maxWidth: dimensions.width * DISPLAY_SCALE,
                         touchAction: 'none'
                     }}
                     onMouseDown={() => setIsDrawing(true)}
@@ -43,27 +43,27 @@ const PixelCanvas = ({ name, width = 64, height = 64 }) => {
                     onTouchEnd={() => setIsDrawing(false)}
                     onTouchMove={handleInteraction}
                 />
-            </div>
+                </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-md bg-secondary p-md border border-strong rounded shadow-sm w-full max-w-lg">
+            <div className="flex flex-wrap items-center justify-center gap-md border-t border-strong bg-secondary p-sm">
                 <div className="flex items-center gap-sm">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Ink:</label>
+                    <label className="text-xs font-semibold text-secondary">Ink:</label>
                     <input
                         type="color"
                         value={color}
                         onChange={(e) => setColor(e.target.value)}
-                        className="w-8 h-8 cursor-pointer border-2 border-strong bg-transparent p-0"
+                        className="h-7 w-7 cursor-pointer border border-default bg-transparent p-0"
                     />
                 </div>
 
                 <div className="h-4 w-px bg-strong/20 hidden sm:block"></div>
 
                 <div className="flex items-center gap-sm">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Brush:</label>
+                    <label className="text-xs font-semibold text-secondary">Brush:</label>
                     <select
                         value={brushSize}
                         onChange={(e) => setBrushSize(parseInt(e.target.value))}
-                        className="bg-primary border-2 border-strong font-serif text-xs px-xs py-2xs"
+                        className="border border-default bg-primary px-xs py-2xs font-serif text-xs"
                     >
                         <option value="1">1px</option>
                         <option value="2">2px</option>
@@ -77,22 +77,16 @@ const PixelCanvas = ({ name, width = 64, height = 64 }) => {
                 <div className="h-4 w-px bg-strong/20 hidden sm:block"></div>
 
                 <button
+                    type="button"
                     onClick={undo}
-                    className="flex flex-col items-center group px-sm py-2xs hover:bg-strong/5 transition-colors rounded border-2 border-transparent hover:border-strong/10"
+                    className="group flex items-center gap-xs border border-transparent bg-transparent px-sm py-2xs hover:border-default hover:bg-primary"
                     title="Ctrl+Z to Undo"
                 >
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-secondary group-hover:text-strong">Undo</span>
-                    <span className="text-[9px] opacity-60 font-serif">ctrl+z</span>
+                    <span className="text-xs font-semibold text-secondary group-hover:text-strong">Undo</span>
+                    <span className="font-serif text-xs opacity-60">ctrl+z</span>
                 </button>
 
-                <div className="h-4 w-px bg-strong/20 hidden sm:block"></div>
-
-                <div className="text-center">
-                    <p className="font-serif text-sm uppercase font-bold tracking-tight">{name.replace(/_/g, ' ')}</p>
-                    <p className="text-[10px] text-secondary lowercase opacity-70 italic">
-                        {dimensions.width}x{dimensions.height} grid / real-time sync
-                    </p>
-                </div>
+            </div>
             </div>
         </div>
     );

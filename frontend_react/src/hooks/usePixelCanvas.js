@@ -115,18 +115,28 @@ export const usePixelCanvas = (name, initialWidth, initialHeight) => {
 
     // Undo logic
     const undo = useCallback(() => {
-        if (undoStack.current.length === 0 || !isRunning) return;
+        let lastStroke;
 
-        const lastStroke = undoStack.current.pop();
+        // Include a just-finished stroke even if React has not run the
+        // isDrawing effect that normally commits it to history yet.
+        if (currentStrokePixels.current.size > 0) {
+            lastStroke = new Map(currentStrokePixels.current);
+            currentStrokePixels.current.clear();
+        } else {
+            lastStroke = undoStack.current.pop();
+        }
+
+        if (!lastStroke) return;
         const pixelsToRestore = Array.from(lastStroke.values());
 
-        // Broadcast restoration as a batch
-        send({
-            type: 'batch',
-            data: pixelsToRestore
-        });
+        if (isRunning) {
+            send({
+                type: 'batch',
+                data: pixelsToRestore
+            });
+        }
 
-        // Optimistic local update
+        // Undo locally even if the socket is reconnecting.
         onMessage({ type: 'batch', data: pixelsToRestore });
     }, [send, isRunning, onMessage]);
 

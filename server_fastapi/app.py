@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routes import health, sat
+from routes import health, palworld, sat
 
 
 def create_app() -> FastAPI:
@@ -28,6 +28,7 @@ def create_app() -> FastAPI:
 
     application.include_router(health.router)
     application.include_router(sat.router)
+    application.include_router(palworld.router)
     return application
 
 

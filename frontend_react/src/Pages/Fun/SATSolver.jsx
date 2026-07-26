@@ -3,6 +3,7 @@ import { useSATSolver } from "../../hooks/useSATSolver";
 import SolverControls from "../../Components/Fun/SATSolver/SolverControls";
 import SolverResults from "../../Components/Fun/SATSolver/SolverResults";
 import PageTemplate from "../../Components/Common/PageTemplate";
+import Callout from "../../Components/Common/Callout";
 
 /**
  * View: SATSolver Page
@@ -14,21 +15,21 @@ function SATSolver() {
   const { state, actions } = useSATSolver();
 
   return (
-    <PageTemplate title="Truth table generator" date="Jan 2026">
+    <PageTemplate
+      title="Truth table generator"
+      date="Jan 2026"
+      tag="Filthy cheat tool for PHIL1012"
+    >
       <div className="mb-md">
-
-        <p className="italic text-secondary mb-xl text-left border-l-[3px] border-default pl-6 select-none opacity-80">
-          "Filthy cheat tool for PHIL1012"
-        </p>
-
         <p className="text-body">
           This simple tool will brute-force the entire truth table of your boolean SAT formula.
           Made to test out asynchronous page updates.
         </p>
 
-        <div className="mt-lg space-y-md">
-          <div>
-            <span className="font-semibold text-primary">Recognized operators:</span>
+        <Callout emoji="🧠" variant="note">
+          <div className="space-y-md">
+            <div>
+              <h2 className="mb-xs font-semibold">Recognized operators</h2>
             <ul className="mt-xs list-disc list-inside space-y-xs text-primary">
               <li><code className="px-sm py-2xs bg-code text-primary rounded font-mono text-base">∧</code> and</li>
               <li><code className="px-sm py-2xs bg-code text-primary rounded font-mono text-base">¬</code> not</li>
@@ -37,23 +38,24 @@ function SATSolver() {
               <li><code className="px-sm py-2xs bg-code text-primary rounded font-mono text-base">↔</code> iff</li>
               <li><code className="px-sm py-2xs bg-code text-primary rounded font-mono text-base">( )</code> parentheses</li>
             </ul>
-          </div>
+            </div>
 
-          <div>
-            <span className="font-semibold text-primary">Variables:</span>
-            <span className="ml-xs text-primary">Any non-operator, non-whitespace character</span>
-            <span className="ml-xs text-secondary font-sans">(e.g., <code className="px-sm py-2xs bg-code text-primary rounded font-mono text-base">a</code>, <code className="px-sm py-2xs bg-code text-primary rounded font-mono text-base">x</code>, <code className="px-sm py-2xs bg-code text-primary rounded font-mono text-base">p</code>)</span>
-          </div>
+            <div>
+              <h2 className="mb-xs font-semibold">Variables</h2>
+              <span>Any non-operator, non-whitespace character </span>
+              <span className="opacity-75">(e.g., <code className="px-sm py-2xs bg-code text-primary rounded font-mono text-base">a</code>, <code className="px-sm py-2xs bg-code text-primary rounded font-mono text-base">x</code>, <code className="px-sm py-2xs bg-code text-primary rounded font-mono text-base">p</code>)</span>
+            </div>
 
-          <div className="p-md bg-tertiary border-l-4 border-accent-primary rounded">
-            <div className="font-semibold text-primary mb-xs">Important Notes:</div>
-            <ul className="list-disc list-inside space-y-xs text-primary">
-              <li>Parser is left-associative with equal precedence — use parentheses to gaurantee order of operations</li>
-              <li>Example: <code className="px-sm py-2xs bg-code text-primary rounded font-mono text-base">(x ∧ y) ∨ z</code> is good</li>
-              <li>Avoid too many variables (exponential combinations!)</li>
-            </ul>
+            <div>
+              <h2 className="mb-xs font-semibold">Important notes</h2>
+              <ul className="list-disc list-inside space-y-xs">
+                <li>Parser is left-associative with equal precedence — use parentheses to guarantee order of operations</li>
+                <li>Example: <code className="px-sm py-2xs bg-code text-primary rounded font-mono text-base">(x ∧ y) ∨ z</code> is good</li>
+                <li>Avoid too many variables (exponential combinations!)</li>
+              </ul>
+            </div>
           </div>
-        </div>
+        </Callout>
 
         <SolverControls
           formula={state.formula}

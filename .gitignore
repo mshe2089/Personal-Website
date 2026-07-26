@@ -8,5 +8,6 @@ dist/
 build/
 .DS_Store
 certs/
+.secrets/
 TODO.md
 target/

@@ -1,125 +1,215 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { navigationGroups } from '../../config/routes';
+import { visibleRoutes } from '../../config/routes';
 import { useClock } from '../../hooks/useClock';
 import { useTheme } from '../../hooks/useTheme';
 
-function NavGroup({ name, routes, isOpen, onToggle }) {
-  if (name === 'Main') {
-    return routes.map((route) => (
-      <Link
-        key={route.path}
-        to={route.path}
-        className="hidden sm:inline text-primary no-underline font-medium text-sm lg:text-base hover:text-secondary transition-colors"
-      >
-        {route.name}
-      </Link>
-    ));
-  }
+function buildRouteTree(routes) {
+  const root = { directories: {}, routes: [] };
+
+  routes.forEach((route) => {
+    if (route.path === '/') {
+      root.routes.push(route);
+      return;
+    }
+
+    const segments = route.path.split('/').filter(Boolean);
+    const filename = segments.pop();
+    let directory = root;
+
+    segments.forEach((segment) => {
+      directory.directories[segment] ??= { directories: {}, routes: [] };
+      directory = directory.directories[segment];
+    });
+
+    directory.routes.push({ ...route, filename });
+  });
+
+  return root;
+}
+
+function Directory({ name, node, path, depth = 0, currentPath, onNavigate }) {
+  const containsCurrentPath = currentPath.startsWith(`${path}/`);
+  const [isExpanded, setIsExpanded] = useState(containsCurrentPath);
 
   return (
-    <div className="relative">
+    <li>
       <button
-        className="bg-transparent border-none cursor-pointer text-primary font-medium text-sm lg:text-base flex items-center gap-xs hover:text-secondary p-0"
-        onClick={onToggle}
-        aria-expanded={isOpen}
+        type="button"
+        className="nav-tree-row nav-tree-directory"
+        style={{ paddingLeft: `${depth * 1.1 + 0.75}rem` }}
+        onClick={() => setIsExpanded((expanded) => !expanded)}
+        aria-expanded={isExpanded}
       >
-        {name} <span className="text-xs">▼</span>
+        <span aria-hidden="true">{isExpanded ? '▾' : '▸'}</span>
+        <span>{name}/</span>
       </button>
-      {isOpen && (
-        <div className="absolute top-[120%] left-1/2 -translate-x-1/2 bg-primary border border-strong min-w-[180px] shadow-lg flex flex-col z-20 animate-in fade-in zoom-in-95 duration-200">
-          {routes.map((route) => (
-            <Link
-              key={route.path}
-              to={route.path}
-              className="text-primary no-underline p-md text-sm hover:bg-tertiary block border-b border-strong last:border-none transition-colors"
-            >
-              {route.name}
-            </Link>
+
+      {isExpanded && (
+        <ul className="m-0 list-none p-0">
+          {Object.entries(node.directories).map(([directoryName, directory]) => (
+            <Directory
+              key={directoryName}
+              name={directoryName}
+              node={directory}
+              path={`${path}/${directoryName}`}
+              depth={depth + 1}
+              currentPath={currentPath}
+              onNavigate={onNavigate}
+            />
           ))}
-        </div>
+          {node.routes.map((route) => (
+            <RouteEntry
+              key={route.path}
+              route={route}
+              depth={depth + 1}
+              currentPath={currentPath}
+              onNavigate={onNavigate}
+            />
+          ))}
+        </ul>
       )}
-    </div>
+    </li>
+  );
+}
+
+function RouteEntry({ route, depth = 0, currentPath, onNavigate }) {
+  const filename = route.path === '/' ? 'home' : route.filename;
+  const isActive = currentPath === route.path;
+
+  return (
+    <li>
+      <Link
+        to={route.path}
+        onClick={onNavigate}
+        className={`nav-tree-row nav-tree-file ${isActive ? 'is-active' : ''}`}
+        style={{ paddingLeft: `${depth * 1.1 + 0.75}rem` }}
+        aria-current={isActive ? 'page' : undefined}
+      >
+        <span aria-hidden="true">└</span>
+        <span>{filename}</span>
+      </Link>
+    </li>
   );
 }
 
 function NavBar() {
-  const [activeGroup, setActiveGroup] = useState(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const routeTree = useMemo(() => buildRouteTree(visibleRoutes), []);
+  const location = useLocation();
   const time = useClock();
   const { isDark, toggleTheme } = useTheme();
-  const location = useLocation();
 
   useEffect(() => {
-    setActiveGroup(null);
-  }, [location]);
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') setIsOpen(false);
+    };
 
-  const formattedTime = `${time.toLocaleDateString('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-  })} • ${time.toLocaleTimeString('en-US', { hour12: false })}`;
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, []);
+
+  const formattedTime = time.toLocaleString('en-AU', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    hour12: false,
+  });
 
   return (
-    <nav className="relative flex w-full max-w-full items-center justify-between gap-md px-md py-lg lg:p-lg border-b border-strong bg-secondary sticky top-0 z-[1000] shadow-sm font-sans">
-      {activeGroup && (
-        <button
-          type="button"
-          className="fixed inset-0 z-0 cursor-default bg-transparent border-0 p-0"
-          aria-label="Close navigation menu"
-          onClick={() => setActiveGroup(null)}
-        />
-      )}
-
-      <div className="relative z-10 shrink-0 text-lg sm:text-xl font-bold tracking-tight flex items-center gap-xs sm:gap-sm">
-        <Link to="/" className="text-primary no-underline hover:text-secondary font-serif">
-          muqing.dev
-        </Link>
-        <button
-          type="button"
-          onClick={toggleTheme}
-          className="bg-transparent border-none cursor-pointer text-lg p-0 hover:scale-110 transition-transform"
-          title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-        >
-          {isDark ? '☀️' : '🌙'}
-        </button>
-      </div>
-
-      <div className="relative z-10 min-w-0 flex items-center gap-md lg:gap-lg lg:absolute lg:left-1/2 lg:-translate-x-1/2">
-        {navigationGroups.map((group) => (
-          <NavGroup
-            key={group.name}
-            {...group}
-            isOpen={activeGroup === group.name}
-            onToggle={() => {
-              setActiveGroup(activeGroup === group.name ? null : group.name);
-            }}
-          />
-        ))}
-      </div>
-
-      <div className="relative z-10 hidden lg:flex items-center gap-md">
-        <a
-          href="https://github.com/mshe2089"
-          target="_blank"
-          rel="noreferrer"
-          className="text-secondary no-underline text-xs uppercase tracking-wide hover:text-primary transition-colors"
-        >
-          GitHub
-        </a>
-        <a
-          href="https://www.linkedin.com/in/muqing-shen-604a3b1a4/"
-          target="_blank"
-          rel="noreferrer"
-          className="text-secondary no-underline text-xs uppercase tracking-wide hover:text-primary transition-colors"
-        >
-          LinkedIn
-        </a>
-        <div className="h-4 w-px bg-strong mx-xs" />
-        <span className="text-sm lg:text-base font-medium text-primary min-w-[140px] text-right tabular-nums">
-          {formattedTime}
+    <>
+      <button
+        type="button"
+        className="nav-trigger"
+        onClick={() => setIsOpen(true)}
+        aria-label="Open site directory"
+        aria-expanded={isOpen}
+      >
+        <span className="nav-trigger-surface" aria-hidden="true">
+          <span className="nav-trigger-icon">☰</span>
+          <span className="nav-trigger-arrow">›</span>
         </span>
-      </div>
-    </nav>
+      </button>
+
+      <button
+        type="button"
+        className={`nav-backdrop ${isOpen ? 'is-open' : ''}`}
+        onClick={() => setIsOpen(false)}
+        aria-label="Close site directory"
+        tabIndex={isOpen ? 0 : -1}
+      />
+
+      <nav className={`nav-drawer ${isOpen ? 'is-open' : ''}`} aria-label="Site directory">
+        <header className="flex items-start justify-between gap-md border-b border-default p-md">
+          <div>
+            <Link
+              to="/"
+              onClick={() => setIsOpen(false)}
+              className="text-lg text-primary no-underline font-semibold"
+            >
+              muqing.dev
+            </Link>
+          </div>
+          <button
+            type="button"
+            className="nav-icon-button text-xl leading-none"
+            onClick={() => setIsOpen(false)}
+            aria-label="Close site directory"
+          >
+            ×
+          </button>
+        </header>
+
+        <div className="flex-1 overflow-y-auto py-sm">
+          <p className="m-0 px-md pb-xs text-sm font-medium text-secondary">site/</p>
+          <ul className="m-0 list-none p-0">
+            {routeTree.routes.map((route) => (
+              <RouteEntry
+                key={route.path}
+                route={route}
+                currentPath={location.pathname}
+                onNavigate={() => setIsOpen(false)}
+              />
+            ))}
+            {Object.entries(routeTree.directories).map(([name, node]) => (
+              <Directory
+                key={name}
+                name={name}
+                node={node}
+                path={`/${name}`}
+                currentPath={location.pathname}
+                onNavigate={() => setIsOpen(false)}
+              />
+            ))}
+          </ul>
+        </div>
+
+        <footer className="border-t border-default p-md text-xs text-secondary">
+          <div className="mb-sm flex items-center justify-between">
+            <span>{formattedTime}</span>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="nav-icon-button text-sm"
+              title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {isDark ? '☀️ light' : '🌙 dark'}
+            </button>
+          </div>
+          <div className="flex gap-md">
+            <a href="https://github.com/mshe2089" target="_blank" rel="noreferrer">
+              github
+            </a>
+            <a
+              href="https://www.linkedin.com/in/muqing-shen-604a3b1a4/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              linkedin
+            </a>
+          </div>
+        </footer>
+      </nav>
+    </>
   );
 }
 

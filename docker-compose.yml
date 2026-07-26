@@ -4,9 +4,19 @@ services:
       context: .
       dockerfile: ./server_fastapi/dockerfile.flaskr
     image: personal-website-api
+    user: "1000:1000"
     restart: always
     environment:
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-}
+      - PALWORLD_API_URL=http://host.docker.internal:8212/v1/api
+      - PALWORLD_ADMIN_PASSWORD_FILE=/run/secrets/palworld_admin_password
+      - PALWORLD_PUBLIC_HOSTNAME=pal.muqing.dev
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    secrets:
+      - palworld_admin_password
+    volumes:
+      - /proc:/host/proc:ro
   api:
     build:
       context: .
@@ -27,6 +37,21 @@ services:
     environment:
       - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
     restart: always
+
+  cloudflare-ddns:
+    image: favonia/cloudflare-ddns:1
+    restart: always
+    environment:
+      - CLOUDFLARE_API_TOKEN_FILE=/run/secrets/cloudflare_ddns_token
+      - IP4_DOMAINS=pal.muqing.dev
+      - PROXIED=false
+    secrets:
+      - cloudflare_ddns_token
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
 
   # Rust canvas service - handles HTTP/WebSocket canvas endpoints
   rust:
@@ -55,3 +80,9 @@ services:
 
 volumes:
   redis_data:
+
+secrets:
+  cloudflare_ddns_token:
+    file: ./.secrets/cloudflare-ddns-token
+  palworld_admin_password:
+    file: ./.secrets/palworld-admin-password

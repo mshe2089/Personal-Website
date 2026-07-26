@@ -1,5 +1,7 @@
 import Landing from '../Pages/Landing';
+import Diatribe from '../Pages/Diatribe';
 import SATSolver from '../Pages/Fun/SATSolver';
+import Palworld from '../Pages/Servers/Palworld';
 import NotFound from '../Pages/NotFound';
 
 export const routeRegistry = [
@@ -8,6 +10,18 @@ export const routeRegistry = [
     component: Landing,
     name: 'Welcome',
     category: 'Main',
+  },
+  {
+    path: '/demo/diatribe',
+    component: Diatribe,
+    name: 'Diatribe',
+    category: 'Demo',
+  },
+  {
+    path: '/servers/palworld',
+    component: Palworld,
+    name: 'Palworld',
+    category: 'Servers',
   },
   {
     path: '/tools/SATSolver',
