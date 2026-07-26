@@ -4,21 +4,20 @@ import SolverControls from "../../Components/Fun/SATSolver/SolverControls";
 import SolverResults from "../../Components/Fun/SATSolver/SolverResults";
 import PageTemplate from "../../Components/Common/PageTemplate";
 
+/**
+ * View: SATSolver Page
+ *
+ * Binds to the useSATSolver ViewModel to present the SAT Solver interface.
+ */
 function SATSolver() {
-  const {
-    formula,
-    result,
-    isLoading,
-    error,
-    handleFormulaChange,
-    submit
-  } = useSATSolver();
+  // Bind to the ViewModel
+  const { state, actions } = useSATSolver();
 
   return (
     <PageTemplate title="Truth table generator" date="Jan 2026">
       <div className="mb-md">
 
-        <p className="italic text-secondary mb-10 text-left border-l-[3px] border-default pl-6">
+        <p className="italic text-secondary mb-xl text-left border-l-[3px] border-default pl-6 select-none opacity-80">
           "Filthy cheat tool for PHIL1012"
         </p>
 
@@ -57,14 +56,14 @@ function SATSolver() {
         </div>
 
         <SolverControls
-          formula={formula}
-          onChange={handleFormulaChange}
-          onSubmit={submit}
-          isLoading={isLoading}
+          formula={state.formula}
+          onChange={actions.handleFormulaChange}
+          onSubmit={actions.submit}
+          isLoading={state.isLoading}
         />
       </div>
 
-      <SolverResults result={result} error={error} />
+      <SolverResults result={state.result} error={state.error} />
     </PageTemplate>
   );
 }

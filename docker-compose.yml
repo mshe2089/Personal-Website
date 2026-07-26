@@ -5,6 +5,8 @@ services:
       dockerfile: ./server_fastapi/dockerfile.flaskr
     image: personal-website-api
     restart: always
+    environment:
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-}
   api:
     build:
       context: .
@@ -16,6 +18,9 @@ services:
       - "${PORT_HTTPS:-443}:443"
     volumes:
       - ${SSL_CERT_PATH:-./certs}:/etc/nginx/ssl
+    depends_on:
+      - core
+      - rust
   tunnel:
     image: cloudflare/cloudflared:latest
     command: tunnel run
@@ -23,51 +28,30 @@ services:
       - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
     restart: always
 
-  # Rust web server - handles HTTP/WebSocket endpoints
+  # Rust canvas service - handles HTTP/WebSocket canvas endpoints
   rust:
     build:
       context: ./server_rust
       dockerfile: Dockerfile
     image: personal-website-rust-server
     restart: always
-    ports:
-      - "8000:8000"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock # Docker API access for spawning runners
     environment:
-      - RUNNER_IMAGE=personal-website-rust-runner
-      - RUNNER_NETWORK=personal-website_rust-execution
-    networks:
-      - default
-      - rust-execution
-
-  # Runner template - ephemeral containers spawned dynamically by rust-server
-  # This service builds the image but doesn't run continuously
-  rust-runner:
-    build:
-      context: ./server_rust
-      dockerfile: Dockerfile.runner
-    image: personal-website-rust-runner
-    profiles:
-      - manual # Prevents auto-start, only used as template image
-    security_opt:
-      - no-new-privileges:true
-      - seccomp=./server_rust/seccomp-profile.json
-    cap_drop:
-      - ALL
-    read_only: true
-    tmpfs:
-      - /workspace:exec,nosuid,size=100M # Writable workspace for code compilation and execution
-      - /tmp:exec,nosuid,size=50M # Rustc needs /tmp for intermediate files
-    mem_limit: 128M
-    cpus: 0.5
-    pids_limit: 50
-    network_mode: none # No network access for user code
+      - REDIS_URL=redis://redis:6379
+      - CANVAS_TTL_SECONDS=${CANVAS_TTL_SECONDS:-86400}
+    depends_on:
+      redis:
+        condition: service_healthy
 
   redis:
     image: redis:alpine
     restart: always
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
-networks:
-  rust-execution:
-    internal: true # Isolated network for runner containers
+volumes:
+  redis_data:

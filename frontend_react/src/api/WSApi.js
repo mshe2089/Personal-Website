@@ -5,7 +5,7 @@
 
 /**
  * Creates and manages a WebSocket connection
- * @param {string} path - The WebSocket path (e.g., /api/v1/ws/progress)
+ * @param {string} path - The WebSocket path
  * @param {Object} callbacks - Event handlers
  * @param {Function} callbacks.onMessage - Called when a message is received
  * @param {Function} callbacks.onError - Called when an error occurs

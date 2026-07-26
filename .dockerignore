@@ -1,0 +1,10 @@
+.git
+.github
+.env
+.env.*
+certs
+**/node_modules
+**/dist
+**/target
+**/__pycache__
+*.log

@@ -1,43 +1,33 @@
 import Landing from '../Pages/Landing';
 import SATSolver from '../Pages/Fun/SATSolver';
-import AsyncDemo from '../Pages/Fun/AsyncDemo';
-import PostScarcity from '../Pages/Thoughts/PostScarcity';
-import RustPlayground from '../Pages/Labs/RustPlayground';
+import NotFound from '../Pages/NotFound';
 
 export const routeRegistry = [
-    {
-        path: "/",
-        component: Landing,
-        name: "Welcome",
-        hidden: false,
-        category: "Main"
-    },
-    {
-        path: "/thoughts/post-scarcity",
-        component: PostScarcity,
-        name: "Post-Scarcity Society",
-        hidden: false,
-        category: "Thoughts"
-    },
-    {
-        path: "/tools/rust-playground",
-        component: RustPlayground,
-        name: "Rust Playground",
-        hidden: false,
-        category: "Labs"
-    },
-    {
-        path: "/tools/SATSolver",
-        component: SATSolver,
-        name: "SAT Solver",
-        hidden: false,
-        category: "Fun"
-    },
-    {
-        path: "/tools/async-demo",
-        component: AsyncDemo,
-        name: "Async Demo",
-        hidden: false,
-        category: "Fun"
-    }
+  {
+    path: '/',
+    component: Landing,
+    name: 'Welcome',
+    category: 'Main',
+  },
+  {
+    path: '/tools/SATSolver',
+    component: SATSolver,
+    name: 'SAT Solver',
+    category: 'Tools',
+  },
+  {
+    path: '*',
+    component: NotFound,
+    hidden: true,
+  },
 ];
+
+export const visibleRoutes = routeRegistry.filter((route) => !route.hidden);
+
+export const navigationGroups = Object.entries(
+  visibleRoutes.reduce((groups, route) => {
+    const category = route.category ?? 'Other';
+    groups[category] = [...(groups[category] ?? []), route];
+    return groups;
+  }, {}),
+).map(([name, routes]) => ({ name, routes }));

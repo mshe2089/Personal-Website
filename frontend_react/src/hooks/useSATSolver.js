@@ -1,42 +1,39 @@
 import { useState } from 'react';
-import { solveFormula } from '../api/SATSolverApi';
+import { solveSatFormula } from '../api/SatApi';
 
-/**
- * Controller Layer: useSATSolver Hook
- * Manages the state and logic for the SAT Solver.
- */
 export const useSATSolver = () => {
-    const [formula, setFormula] = useState('');
-    const [result, setResult] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
+  const [formula, setFormula] = useState('');
+  const [result, setResult] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-    const handleFormulaChange = (value) => {
-        setFormula(value);
-    };
+  const submit = async () => {
+    if (!formula.trim()) return;
 
-    const submit = async () => {
-        if (!formula.trim()) return;
+    setIsLoading(true);
+    setError(null);
 
-        setIsLoading(true);
-        setError(null);
+    try {
+      setResult(await solveSatFormula(formula));
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-        try {
-            const solution = await solveFormula(formula);
-            setResult(solution);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    return {
-        formula,
-        result,
-        isLoading,
-        error,
-        handleFormulaChange,
-        submit
-    };
+  return {
+    state: {
+      formula,
+      result,
+      isLoading,
+      error,
+      isValid: formula.trim().length > 0,
+      status: isLoading ? 'SOLVING' : 'READY',
+    },
+    actions: {
+      handleFormulaChange: setFormula,
+      submit,
+    },
+  };
 };

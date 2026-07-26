@@ -1,27 +1,11 @@
-# Service: CORE (Logic)
+# FastAPI logic service
 
-**Directory**: `/flaskr`  
-**Container Name**: `personal-website-core-1`
+This internal service provides the SAT solver and a health endpoint.
 
-## Responsibility
+- `app.py`: application factory and middleware
+- `routes/health.py`: health route
+- `routes/sat.py`: bounded SAT API
+- `scripts/sat.py`: Boolean parser and truth-table generator
 
-The **CORE** service is the computational hub of the Lab. It handles all stateful logic and heavy mathematical processing.
-
-- **SAT Solver**: Provides a specialized API for truth table generation and logical verification.
-- **REST API**: Serves JSON responses to the **API** gateway.
-- **Production Serving**: Uses `waitress-serve` to ensure stable, multi-threaded performance.
-
-## Architecture
-
-- **Backend**: Flask (Python 3.9)
-- **Server**: Waitress (Production WSGI)
-- **Networking**: Listens internally on port `5000`. Does NOT expose ports to the host directly.
-
-## Setup & Configuration
-
-- **Dependencies**: Defined in `requirements.txt`.
-- **Environment**: Managed through `config.py` (Production vs. Development modes).
-- **Docker**: `dockerfile.flaskr` handles the Python environment and pip installation.
-
----
-*Documented by Anti*
+The service listens on port `5000` inside the Compose network. NGINX exposes
+it under `/api/v1/python`.

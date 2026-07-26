@@ -1,11 +1,11 @@
 # Build step #1: react
-FROM node:19-alpine AS build-step
+FROM node:20-alpine AS build-step
 WORKDIR /frontend_react
 ENV PATH /frontend_react/node_modules/.bin:$PATH
 
 # Copy manifest files first to leverage Docker layer caching
 COPY ./frontend_react/package.json ./frontend_react/yarn.lock* ./
-RUN yarn install
+RUN yarn install --frozen-lockfile
 
 # Copy the rest of the source code and build
 COPY ./frontend_react .

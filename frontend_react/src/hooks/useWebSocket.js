@@ -13,6 +13,11 @@ export const useWebSocket = (path, options = {}) => {
     const [isRunning, setIsRunning] = useState(false);
     const connectionRef = useRef(null);
 
+    const optionsRef = useRef(options);
+    useEffect(() => {
+        optionsRef.current = options;
+    }, [options]);
+
     const start = useCallback((callbacks = {}) => {
         setIsRunning(true);
         setStatus('CONNECTING');
@@ -21,28 +26,31 @@ export const useWebSocket = (path, options = {}) => {
 
         connectionRef.current = createWebSocketConnection(path, {
             onOpen: () => {
+                console.log(`WebSocket [${path}]: OPEN`);
                 setStatus('OPEN');
                 if (onOpen) onOpen();
-                if (options.onOpen) options.onOpen();
+                if (optionsRef.current.onOpen) optionsRef.current.onOpen();
             },
             onMessage: (data) => {
                 if (onMessage) onMessage(data);
-                if (options.onMessage) options.onMessage(data);
+                if (optionsRef.current.onMessage) optionsRef.current.onMessage(data);
             },
             onError: (err) => {
+                console.error(`WebSocket [${path}]: ERROR`, err);
                 setStatus('ERROR');
                 setIsRunning(false);
                 if (onError) onError(err);
-                if (options.onError) options.onError(err);
+                if (optionsRef.current.onError) optionsRef.current.onError(err);
             },
             onClose: () => {
+                console.log(`WebSocket [${path}]: CLOSED`);
                 setStatus('CLOSED');
                 setIsRunning(false);
                 if (onClose) onClose();
-                if (options.onClose) options.onClose();
+                if (optionsRef.current.onClose) optionsRef.current.onClose();
             }
         });
-    }, [path, options]);
+    }, [path]); // Only depend on path, use ref for options
 
     const stop = useCallback(() => {
         if (connectionRef.current) {

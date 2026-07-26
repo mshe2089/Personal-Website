@@ -1,4 +1,5 @@
 import PageTemplate from '../Components/Common/PageTemplate';
+import PixelCanvas from '../Components/Common/PixelCanvas';
 
 function Landing() {
   return (
@@ -8,6 +9,14 @@ function Landing() {
         <p className="text-body">
           Muqing, or Daniel, code farmer. Currently, I'm looking for an identity for this site. Thanks for visiting!
         </p>
+      </div>
+
+      <hr className="border-0 border-t border-default my-xl" />
+
+      <div className="mb-md">
+        <b className="section-label">Signature Board</b>
+        Since you're already here, why not leave a signature?
+        <PixelCanvas name="signatures" width={256} height={128} />
       </div>
 
       <hr className="border-0 border-t border-default my-xl" />

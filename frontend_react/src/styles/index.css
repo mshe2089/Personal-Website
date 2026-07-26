@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -40,9 +40,9 @@
   /* 64px */
 
   /* --- TYPOGRAPHY --- */
-  --font-serif: 'Playfair Display', Georgia, serif;
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  --font-mono: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  --font-serif: 'JetBrains Mono', monospace;
+  --font-sans: 'JetBrains Mono', monospace;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
 .dark {
@@ -83,8 +83,8 @@ select {
 
 html,
 body {
-  scrollbar-gutter: stable;
-  overflow-y: scroll;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 
@@ -94,11 +94,11 @@ body {
   }
 
   .h1-primary {
-    @apply font-sans text-4xl lg:text-5xl font-extrabold text-primary mb-2xl border-b-2 border-strong pb-sm tracking-tight;
+    @apply font-serif text-4xl lg:text-5xl font-extrabold text-primary mb-2xl border-b-2 border-strong pb-sm tracking-tight;
   }
 
   .section-label {
-    @apply font-sans text-lg font-semibold text-primary uppercase block mb-xs;
+    @apply font-serif text-base font-bold text-primary uppercase block mb-xs;
   }
 
   .text-body {
@@ -112,7 +112,7 @@ body {
 
 @layer base {
   body {
-    @apply bg-primary text-primary antialiased font-sans leading-relaxed m-0;
+    @apply bg-primary text-primary antialiased font-sans leading-relaxed m-0 text-base;
   }
 
   code {
@@ -126,4 +126,9 @@ body {
 
 .App {
   @apply flex-1;
+}
+
+.image-pixelated {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }

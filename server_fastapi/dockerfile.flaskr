@@ -1,7 +1,10 @@
-FROM python:3.9
+FROM python:3.12-slim
 WORKDIR /server_fastapi
+COPY ./server_fastapi/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 COPY ./server_fastapi .
-RUN pip install -r requirements.txt
+RUN useradd --create-home --uid 10001 appuser && chown -R appuser:appuser /server_fastapi
+USER appuser
 
 EXPOSE 5000
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5000"]
